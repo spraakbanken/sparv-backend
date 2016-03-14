@@ -1,0 +1,182 @@
+{
+    "apiVersion": "0.2",
+    "swaggerVersion": "1.1",
+    "basePath": "http://spraakbanken.gu.se/ws",
+    "apis": [
+    {
+        "path": "/korp/annotate",
+        "description": "Run pipeline",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Run the pipeline on a text",
+            "responseClass": "void",
+            "nickname": "getPipeline",
+            "parameters": [
+            {
+                "name": "settings",
+                "description": "Settings",
+                "required": false,
+                "paramType": "query",
+                "dataType": "object"
+            },
+            {
+                "name": "text",
+                "description": "Text (or XML)",
+                "required": true,
+                "paramType": "query",
+                "dataType": "string"
+            },
+            {
+                "name": "incremental",
+                "description": "Incremental (show progress)",
+                "required": false,
+                "paramType": "query",
+                "dataType": "boolean"
+            }
+            ]
+        },
+        {
+            "httpMethod": "POST",
+            "summary": "Run the pipeline on a text",
+            "responseClass": "void",
+            "nickname": "getPipeline",
+            "parameters": [
+            {
+                "name": "settings",
+                "description": "Settings",
+                "required": false,
+                "paramType": "query",
+                "dataType": "object"
+            },
+            {
+                "name": "text",
+                "description": "Text (or XML)",
+                "required": true,
+                "paramType": "body",
+                "dataType": "string"
+            },
+            {
+                "name": "incremental",
+                "description": "Incremental (show progress)",
+                "required": false,
+                "paramType": "query",
+                "dataType": "boolean"
+            }
+            ]
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/join",
+        "description": "Join an existing build",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Join an existing build",
+            "responseClass": "void",
+            "nickname": "getMakefile",
+            "parameters": [
+            {
+                "name": "hash",
+                "description": "Hash",
+                "required": true,
+                "paramType": "query",
+                "dataType": "string"
+            },
+            {
+                "name": "incremental",
+                "description": "Incremental (show progress)",
+                "required": false,
+                "paramType": "query",
+                "dataType": "boolean"
+            }
+            ]
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/makefile",
+        "description": "Get makefile",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "View the Makefile",
+            "responseClass": "void",
+            "nickname": "getMakefile",
+            "parameters": [
+            {
+                "name": "settings",
+                "description": "Settings",
+                "required": false,
+                "paramType": "query",
+                "dataType": "object"
+            }
+            ]
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/schema",
+        "description": "Get the JSON schema",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Get JSON schema for the settings parameter",
+            "responseClass": "void",
+            "nickname": "getSchema"
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/ping",
+        "description": "Ping the service and the catapult",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Ping the service and the catapult",
+            "responseClass": "void",
+            "nickname": "ping"
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/status",
+        "description": "Get status of builds",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Get status of builds",
+            "responseClass": "void",
+            "nickname": "status",
+            "parameters": []
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/cleanup",
+        "description": "Remove builds that are older than 24 hours",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Remove old builds",
+            "responseClass": "void",
+            "nickname": "cleanup"
+        }
+        ]
+    },
+    {
+        "path": "/korp/annotate/cleanup/errors",
+        "description": "Remove erroneous builds",
+        "operations": [
+        {
+            "httpMethod": "GET",
+            "summary": "Remove erroneous builds",
+            "responseClass": "void",
+            "nickname": "cleanupErrors"
+        }
+        ]
+    }
+    ]
+}
+

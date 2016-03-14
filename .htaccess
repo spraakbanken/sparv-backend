@@ -1,0 +1,8 @@
+Options +ExecCGI
+AddHandler wsgi-script .wsgi
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.*)$ index.wsgi/$1 [QSA,PT,L]                
+</IfModule>
