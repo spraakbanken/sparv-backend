@@ -10,7 +10,7 @@ class Config(object):
     """Static settings"""
 
     # Backend adress
-    backend = "http://spraakbanken.gu.se/ws/korp/annotate"
+    backend = "https://ws.spraakbanken.gu.se/ws/sparv/v1"
 
     # Pythonpaths to the sb python directory, and to the the directory of this script:
     sb_python = '/export/res/lb/korpus/tools/annotate/python'
