@@ -12,18 +12,21 @@ class Config(object):
     # Backend adress
     backend = "https://ws.spraakbanken.gu.se/ws/sparv/v1"
 
+    # Path to pipeline (not necessary, only used within this script)
+    pipeline_dir = os.path.join(os.path.dirname(__file__), "pipeline")
+
     # Pythonpaths to the sb python directory, and to the the directory of this script:
-    sb_python = '/export/res/lb/korpus/tools/annotate/python'
-    al_backend = '/export/htdocs_sb/annoteringslabb'
+    sb_python = os.path.join(pipeline_dir, 'python')
+    al_backend = os.path.dirname(__file__)
 
     # Where the pipeline working directory is located
-    builds_dir = '/export/htdocs_sb/annoteringslabb/builds'
+    builds_dir = os.path.join(os.path.dirname(__file__), 'builds')
 
     # The log file location. Set this to None if you rather want to log to stdout
     log_file = os.path.join(builds_dir, 'annotate.log')
 
     # Where the models are hosted (SB_MODELS)
-    sb_models = os.environ.get('SB_MODELS', '/export/res/lb/korpus/tools/annotate/models')
+    sb_models = os.environ.get('SB_MODELS', os.path.join(pipeline_dir, 'models'))
 
     # The number of processes (sent as a -j flag to make)
     processes = 2
