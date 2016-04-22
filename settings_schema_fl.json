@@ -48,7 +48,7 @@
             "title_sv": "Språket av texten",
             "description": "The language in which the text is written",
             "default": "en",
-            "enum": ["en", "fr", "it", "pt", "ru", "es"],
+            "enum": ["as", "ca", "cy", "de", "en", "es", "fr", "gl", "it", "pt", "ru", "sl"],
             "type": "string"
         },
 

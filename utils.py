@@ -17,21 +17,27 @@ TOOL_DICT = {
     "sv": "sv",
     "sv-dev": "sv-dev",
     "sv-1800": "sv-1800",
-    "de": "tt",
-    "bg": "tt",
-    "nl": "tt",
+    "as": "fl",
+    "ca": "fl",
+    "cy": "fl",
     "en": "fl",
+    "es": "fl",
     "fr": "fl",
+    "gl": "fl",
     "it": "fl",
-    "la": "tt",
-    "pl": "tt",
     "pt": "fl",
     "ru": "fl",
+    "sl": "fl",
+    "bg": "tt",
+    "de": "tt",
+    "la": "tt",
     "sk": "tt",
-    "es": "fl",
     "et": "tt",
     "fi": "tt"
+    "nl": "tt",
+    "pl": "tt",
 }
+
 
 # Error messages for different error types
 ERROR_MSG = {
