@@ -41,13 +41,23 @@
             "type": "string"
         },
 
-    "lang": {
+        "lang": {
             "title": "Analysis mode",
             "title_sv": "Analysmode",
             "description": "The language in which the text is written",
             "description_sv": "Språket av texten",
             "default": "sv",
             "enum": ["sv", "sv-1800"],
+            "type": "string"
+        },
+
+        "textmode":{
+            "title": "Text input mode",
+            "title_sv": "Textmode",
+            "description": "",
+            "description_sv": "",
+            "default": "plain",
+            "enum": ["plain", "xml", "file"],
             "type": "string"
         },
 

@@ -43,12 +43,22 @@
             "type": "string"
         },
 
-    "lang": {
+        "lang": {
             "title": "Text language",
             "title_sv": "Språket av texten",
             "description": "The language in which the text is written",
             "default": "sv-dev",
             "enum": ["sv-dev"],
+            "type": "string"
+        },
+
+        "textmode":{
+            "title": "Text input mode",
+            "title_sv": "Textmode",
+            "description": "",
+            "description_sv": "",
+            "default": "plain",
+            "enum": ["plain", "xml", "file"],
             "type": "string"
         },
 

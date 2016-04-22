@@ -52,6 +52,16 @@
             "type": "string"
         },
 
+        "textmode":{
+            "title": "Text input mode",
+            "title_sv": "Textmode",
+            "description": "",
+            "description_sv": "",
+            "default": "plain",
+            "enum": ["plain", "xml", "file"],
+            "type": "string"
+        },
+
         "root": {
             "title": "Root tag",
             "title_sv": "Rottagg",
