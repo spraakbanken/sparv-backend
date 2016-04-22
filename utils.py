@@ -33,7 +33,7 @@ TOOL_DICT = {
     "la": "tt",
     "sk": "tt",
     "et": "tt",
-    "fi": "tt"
+    "fi": "tt",
     "nl": "tt",
     "pl": "tt",
 }
