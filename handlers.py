@@ -524,7 +524,6 @@ def handle(builds, environ, cmd=None):
                 log.info("Starting a new build with text input procedure")
                 yield "<result>\n"
                 txt = post["text"].value
-                txt = escape(txt)
                 # Check for empty input
                 if not txt:
                     log.exception(ERROR_MSG["empty_input"])
