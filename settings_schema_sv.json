@@ -27,6 +27,12 @@
         }
     },
 
+    "struct_tag_simple": {
+        "title": "Costum attribute tag",
+        "title_sv": "Egen attribut-tagg",
+        "type": "string"
+    },
+
     "title": "Corpus pipeline makefile settings",
     "title_sv": "Makefilsinställningar till korpusimportkedjan",
     "documentation": "Settings that generate the Makefile for the corpus pipeline",
@@ -66,7 +72,7 @@
             "title_sv": "Ordsegmentering",
             "description": "Word segmenter to use, or a tag optionally supplied with positional attributes",
             "description_sv": "Ordsegmenterare som ska användas, eller en tagg med valfria positionella attribut",
-            "default": "better_word",
+            "default": "default_tokenizer",
             "type": [
                 {
                     "title": "Segmenter",
@@ -74,7 +80,7 @@
                     "description": "Segmenter tool to use for words",
                     "description_sv": "Modellen/verktyget som ska användas till ordsegmenteringen",
                     "type": "string",
-                    "enum": ["whitespace", "linebreaks", "blanklines", "punkt_word", "better_word"],
+                    "enum": ["whitespace", "linebreaks", "blanklines", "default_tokenizer"],
 					"class": "typewriter"
                 },
                 {
@@ -133,41 +139,99 @@
             ]
         },
 
-        "sentence_segmenter": {
-            "title": "Sentence segmenter",
+        "sentence_segmentation": {
+            "title": "Sentence segmentation",
             "title_sv": "Meningssegmentering",
             "description": "Sentence segmenter to use, or a tag supplied with optional sentence attributes",
             "description_sv": "Meningssegmenterare som ska användas, eller en tagg med valfria menings-attribut",
-            "default": "punkt_sentence",
+            "default": {"sentence_segmenter": "default_tokenizer",
+                        "sentence_chunk": "paragraph"},
             "type": [
                 {
                     "title": "Segmenter",
                     "title_sv": "Segmenterare",
                     "description": "Segmenter tool to use for sentences",
                     "description_sv": "Modellen/verktyget som ska användas till meningssegmenteringen",
-                    "type": "string",
-                    "enum": ["whitespace", "linebreaks", "blanklines", "punkt_sentence", "punctuation"],
-					"class": "typewriter"
+                    "default": "default_tokenizer",
+                    "type": "object",
+                    "properties": {
+                        "sentence_segmenter":{
+                            "title": "Segment by",
+                            "title_sv": "Segmentera med",
+                            "type": "string",
+                            "default": "default_tokenizer",
+                            "enum": ["whitespace", "linebreaks", "blanklines", "default_tokenizer", "punctuation"],
+					        "class": "typewriter"
+                        },
+                        "sentence_chunk": {
+                            "title": "Sentence chunk",
+                            "title_sv": "Meningschunk",
+                            "description": "",
+                            "description_sv": "",
+                            "default": "paragraph",
+                            "type": [
+                                {
+                                    "title": "Pre-defined attribute",
+                                    "title_sv": "Fördefinerad attribut",
+                                    "description": "",
+                                    "description_sv": "",
+                                    "type": "string",
+                                    "enum": ["text", "paragraph"],
+                                    "class": "typewriter"
+                                },
+                                {"$ref": "#/struct_tag_simple"}
+                            ]
+                        }
+                    }
                 },
                 {"$ref": "#/struct_tag"}
             ]
         },
 
-        "paragraph_segmenter": {
-            "title": "Paragraph segmenter",
+        "paragraph_segmentation": {
+            "title": "Paragraph segmentation",
             "title_sv": "Styckessegmentering",
             "description": "Paragraph segmenter to use, or a tag supplied with optional structural attributes",
             "description_sv": "Styckessegmenterare som ska användas, eller en tagg med valfria strukturella attribut",
-            "default": "blanklines",
+            "default": {"paragraph_segmenter": "blanklines",
+                        "paragraph_chunk": "root"},
             "type": [
                 {
                     "title": "Segmenter",
                     "title_sv": "Segmenterare",
                     "description": "Segmenter tool to use for paragraphs",
                     "description_sv": "Modellen/verktyget som ska användas till styckessegmenteringen",
-                    "type": "string",
-                    "enum": ["whitespace", "linebreaks", "blanklines"],
-					"class": "typewriter"
+                    "default": "blanklines",
+                    "type": "object",
+                    "properties": {
+                        "paragraph_segmenter": {
+                            "title": "Segment by",
+                            "title_sv": "Segmentera med",
+                            "type": "string",
+                            "default": "blanklines",
+                            "enum": ["whitespace", "linebreaks", "blanklines"],
+        					"class": "typewriter"
+                        },
+                        "paragraph_chunk": {
+                            "title": "Paragraph chunk",
+                            "title_sv": "Styckeschunk",
+                            "description": "",
+                            "description_sv": "",
+                            "default": "root",
+                            "type": [
+                                {
+                                    "title": "Root tag",
+                                    "title_sv": "Roottagg",
+                                    "description": "",
+                                    "description_sv": "",
+                                    "type": "string",
+                                    "enum": ["root"],
+                					"class": "typewriter"
+                                },
+                                {"$ref": "#/struct_tag_simple"}
+                			]
+                        }
+                    }
                 },
 				{"$ref": "#/struct_tag"},
 				{

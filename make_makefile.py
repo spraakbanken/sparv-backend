@@ -118,104 +118,25 @@ def make_Makefile(settings):
     # custom rules (used for dephead.ref)
     custom_rules = []
 
-    def add_parent(tag):
-        parents.append("token|" + tag)
-
-    def mk_xml_attr(tag, attr):
-        return tag + ":" + attr
-
-    def mk_file_attr(tag, attr):
-        return tag + "." + attr
-
-    def add_attribute(tag, attr, structural, filename=None):
-        filename = filename or tag
-        xml_attr = mk_xml_attr(tag, attr)
-        file_attr = mk_file_attr(filename, attr)
-        struct_attr = mk_xml_attr(filename, attr)
-        xml_cols.append((xml_attr, file_attr))
-        if structural:
-            structs.append((file_attr, struct_attr))
-        else:
-            columns.append((file_attr, struct_attr))
-
-    # Word (token) segmentation
+    # Fix token segmentation
     if analysis != 'fl':
-        ws = settings['word_segmenter']
-        if isinstance(ws, basestring):
-            """Example:
-                word_segmenter: "punkt_word"
-            """
-            token = ([("token_chunk", "sentence"),
-                      ("token_segmenter", ws)])
-        else:
-            """Example:
-                word_segmenter: { tag: "w",
-                                  attributes: { pos: "msd", "language": null }
-                                }
-            """
-            token = [makefile_comment("Using tag " + ws['tag'] + " for words")]
-            # Adds w -> token in xml
-            xml_cols.append((ws['tag'], "token"))
-            for e in ws['attributes']:
-                key = e['key']
-                replace = e['attribute']
-                if replace != "custom":
-                    # Adds w:pos -> msd in xml
-                    if replace == "dephead":
-                        replace += ".ref"
-                    xml_cols.append((mk_xml_attr(ws['tag'], key),
-                                     mk_file_attr('token', replace)))
-                else:
-                    # Adds w:language -> token.language in xml and
-                    #      token.language -> language in columns
-                    xml_cols.append((mk_xml_attr(ws['tag'], key),
-                                     mk_file_attr('token', key)))
-                    columns.append((mk_file_attr('token', key), key))
+        token = make_token(settings, columns, xml_cols)
     else:
         token = []
 
-    # Sentence and Paragraph segmentation
-    def add_segmenter(setting, name, chunk, model=None):
-        if setting == "none":
-            return [makefile_comment("No segmentation for " + name)]
-        if isinstance(setting, basestring):
-            res = [(name + "_chunk", chunk),
-                   (name + "_segmenter", setting)]
-            if model and "punkt" in setting:
-                res.append((name + "_model", model))
-            return res
-        else:
-            """Example
-                sentence_segmenter: { tag: "s",
-                                      attributes: ["mood", "id"]
-                                    }
-            """
-            xml_cols.append((setting['tag'], name))
-            add_parent(name)
-            for attr in setting['attributes']:
-                add_attribute(setting['tag'], attr,
-                              structural=True,
-                              filename=name)
-            return [makefile_comment("Using tag " + setting['tag'] + " for " + name)]
-
-    # add named entity recognition attributes
+    # Add named entity recognition attributes
     if settings.get('named_entity_recognition'):
         for i in settings.get('named_entity_recognition'):
             structs.append(("ne." + i, "ne:" + i))
 
-    # add the obligatory structural attribute sentence.id
+    # Add the obligatory structural attribute sentence.id
     structs.append(('sentence.id', 'sentence:id'))
 
-    # and similar for paragraph if there is some segmentation
+    # Fix sentence and paragraph segmentation
     if analysis != 'fl':
-        if settings['paragraph_segmenter'] != "none":
-            structs.append(('paragraph.n', 'paragraph'))
-
-        sentence_chunk = text if settings['paragraph_segmenter'] == "none" else "paragraph"
-        sentence = add_segmenter(settings['sentence_segmenter'], "sentence", sentence_chunk, "$(punkt_model)")
-        paragraph = add_segmenter(settings['paragraph_segmenter'], "paragraph", text, "$(punkt_model)")
+        sentence = make_sentence(settings)
+        paragraph = make_paragraph(settings, structs, text)
     else:
-        sentence_chunk = []
         sentence = []
         paragraph = []
 
@@ -223,9 +144,9 @@ def make_Makefile(settings):
         if len(attributes) > 0 or add_xml:
             xml_cols.append((tag, tag))
         if len(attributes) > 0:
-            add_parent(tag)
+            add_parent(tag, parents)
             for attr in attributes:
-                add_attribute(tag, attr, structural=True)
+                add_attribute(tag, attr, xml_cols, structs, columns, structural=True)
 
     # Extra tags
     if settings.get('extra_tags'):
@@ -296,6 +217,130 @@ def makefile(d):
     return str(linearise_Makefile(make_Makefile(d)))
 
 
+##### Different auxiliary functions ######
+def make_token(settings, columns, xml_cols):
+    """Fix word (token) segmentation. """
+    ws = settings['word_segmenter']
+    if ws == "default_tokenizer":
+        ws = "better_word"
+    if isinstance(ws, basestring):
+        """Example:
+            word_segmenter: "punkt_word"
+        """
+        return ([("token_chunk", "sentence"),
+                  ("token_segmenter", ws)])
+    else:
+        """Example:
+            word_segmenter: { tag: "w",
+                              attributes: { pos: "msd", "language": null }
+                            }
+        """
+        # Adds w -> token in xml
+        xml_cols.append((ws['tag'], "token"))
+        for e in ws['attributes']:
+            key = e['key']
+            replace = e['attribute']
+            if replace != "custom":
+                # Adds w:pos -> msd in xml
+                if replace == "dephead":
+                    replace += ".ref"
+                xml_cols.append((mk_xml_attr(ws['tag'], key),
+                                 mk_file_attr('token', replace)))
+            else:
+                # Adds w:language -> token.language in xml and
+                #      token.language -> language in columns
+                xml_cols.append((mk_xml_attr(ws['tag'], key),
+                                 mk_file_attr('token', key)))
+                columns.append((mk_file_attr('token', key), key))
+        return [makefile_comment("Using tag " + ws['tag'] + " for words")]
+
+
+def make_sentence(settings):
+    """Extract info from sentence_segmentation. """
+    if settings['sentence_segmentation'].get("sentence_segmenter"):
+        sentence_segmenter = settings['sentence_segmentation']["sentence_segmenter"]
+        if sentence_segmenter == "default_tokenizer":
+            sentence_segmenter = "punkt_sentence"
+    else:
+        sentence_segmenter = settings['sentence_segmentation']
+    if settings['sentence_segmentation'].get('sentence_chunk'):
+        sentence_chunk = settings['sentence_segmentation']['sentence_chunk']
+    else:
+        sentence_chunk = None
+    return add_segmenter(sentence_segmenter, "sentence", sentence_chunk)
+
+
+def make_paragraph(settings, structs, text):
+    """Extract info from paragraph_segmentation. """
+    if settings.get('paragraph_segmentation') != "none":
+        # add the structural attribute paragraph.n if there is segmentation
+        structs.append(('paragraph.n', 'paragraph'))
+        if settings['paragraph_segmentation'].get("paragraph_segmenter"):
+            paragraph_segmenter = settings['paragraph_segmentation']['paragraph_segmenter']
+        else:
+            paragraph_segmenter = settings['paragraph_segmentation']
+        if settings['paragraph_segmentation'].get('paragraph_chunk'):
+            paragraph_chunk = settings['paragraph_segmentation']['paragraph_chunk']
+            if paragraph_chunk == "root":
+                paragraph_chunk = text
+        else:
+            paragraph_chunk = None
+        return add_segmenter(paragraph_segmenter, "paragraph", paragraph_chunk)
+    else:
+        return add_segmenter("none", "paragraph", None)
+
+
+def add_segmenter(setting, name, chunk):
+    """For sentence and paragraph segmentation. """
+    if setting == "none":
+        return [makefile_comment("No segmentation for " + name)]
+    if isinstance(setting, basestring):
+        res = [(name + "_chunk", chunk),
+               (name + "_segmenter", setting)]
+        return res
+    else:
+        """Example
+            sentence_segmenter: { tag: "s",
+                                  attributes: ["mood", "id"]
+                                }
+        """
+        xml_cols.append((setting['tag'], name))
+        add_parent(name, parents)
+        for attr in setting['attributes']:
+            add_attribute(setting['tag'], attr,
+                          xml_cols,
+                          structs,
+                          columns,
+                          structural=True,
+                          filename=name)
+        return [makefile_comment("Using tag " + setting['tag'] + " for " + name)]
+
+
+def add_parent(tag, parents):
+    parents.append("token|" + tag)
+
+
+def mk_xml_attr(tag, attr):
+    return tag + ":" + attr
+
+
+def mk_file_attr(tag, attr):
+    return tag + "." + attr
+
+
+def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None):
+    filename = filename or tag
+    xml_attr = mk_xml_attr(tag, attr)
+    file_attr = mk_file_attr(filename, attr)
+    struct_attr = mk_xml_attr(filename, attr)
+    xml_cols.append((xml_attr, file_attr))
+    if structural:
+        structs.append((file_attr, struct_attr))
+    else:
+        columns.append((file_attr, struct_attr))
+
+
+##########################################
 if __name__ == '__main__':
     import sb.util
 
