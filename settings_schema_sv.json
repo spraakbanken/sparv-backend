@@ -2,6 +2,8 @@
     "struct_tag": {
         "title": "Structural attribute tag",
         "title_sv": "Strukturellt-attribut-tagg",
+        "description": "A tag for a structral attribute",
+        "description_sv": "En tagg för ett strukturellt attribut",
         "type": "object",
         "properties": {
             "tag": {
@@ -30,6 +32,8 @@
     "struct_tag_simple": {
         "title": "Costum attribute tag",
         "title_sv": "Egen attribut-tagg",
+        "description": "Attribute tag which segmentation is based on",
+        "description_sv": "Attribut-tagg som segmenteringen är baserad på",
         "type": "string"
     },
 
@@ -50,8 +54,6 @@
         "lang": {
             "title": "Analysis mode",
             "title_sv": "Analysmode",
-            "description": "The language in which the text is written",
-            "description_sv": "Språket av texten",
             "default": "sv",
             "enum": ["sv", "sv-1800"],
             "type": "string"
@@ -59,9 +61,9 @@
 
         "textmode":{
             "title": "Text input mode",
-            "title_sv": "Textmode",
-            "description": "",
-            "description_sv": "",
+            "title_sv": "Textläge",
+            "description": "Input format for the pipeline",
+            "description_sv": "Indataformatet till importkedjan",
             "default": "plain",
             "enum": ["plain", "xml", "file"],
             "type": "string"
@@ -105,6 +107,8 @@
                             "items": {
                                 "title": "Positional attribute",
                                 "title_sv": "Positionellt attribut",
+                                "description": "A positional attribute in the word tag",
+                                "description_sv": "Ett positionellt attribut i ordtaggen",
                                 "type": "object",
                                 "properties": {
                                     "key": {
@@ -150,14 +154,14 @@
                 {
                     "title": "Segmenter",
                     "title_sv": "Segmenterare",
-                    "description": "Segmenter tool to use for sentences",
-                    "description_sv": "Modellen/verktyget som ska användas till meningssegmenteringen",
                     "default": "default_tokenizer",
                     "type": "object",
                     "properties": {
                         "sentence_segmenter":{
                             "title": "Segment by",
                             "title_sv": "Segmentera med",
+                            "description": "Segmenter tool to use for sentences",
+                            "description_sv": "Modellen/verktyget som ska användas till meningssegmenteringen",
                             "type": "string",
                             "default": "default_tokenizer",
                             "enum": ["whitespace", "linebreaks", "blanklines", "default_tokenizer", "punctuation"],
@@ -166,15 +170,13 @@
                         "sentence_chunk": {
                             "title": "Sentence chunk",
                             "title_sv": "Meningschunk",
-                            "description": "",
-                            "description_sv": "",
+                            "description": "Chunk which the sentence segmentation should be based on",
+                            "description_sv": "Chunk som meningssegmenteringen ska baseras på",
                             "default": "paragraph",
                             "type": [
                                 {
                                     "title": "Pre-defined attribute",
                                     "title_sv": "Fördefinerad attribut",
-                                    "description": "",
-                                    "description_sv": "",
                                     "type": "string",
                                     "enum": ["text", "paragraph"],
                                     "class": "typewriter"
@@ -199,14 +201,14 @@
                 {
                     "title": "Segmenter",
                     "title_sv": "Segmenterare",
-                    "description": "Segmenter tool to use for paragraphs",
-                    "description_sv": "Modellen/verktyget som ska användas till styckessegmenteringen",
                     "default": "blanklines",
                     "type": "object",
                     "properties": {
                         "paragraph_segmenter": {
                             "title": "Segment by",
                             "title_sv": "Segmentera med",
+                            "description": "Segmenter tool to use for paragraphs",
+                            "description_sv": "Modellen/verktyget som ska användas till styckessegmenteringen",
                             "type": "string",
                             "default": "blanklines",
                             "enum": ["whitespace", "linebreaks", "blanklines"],
@@ -215,15 +217,13 @@
                         "paragraph_chunk": {
                             "title": "Paragraph chunk",
                             "title_sv": "Styckeschunk",
-                            "description": "",
-                            "description_sv": "",
+                            "description": "Chunk which the paragraph segmentation is based on",
+                            "description_sv": "Chunk som styckessegmenteringen är baserad på",
                             "default": "root",
                             "type": [
                                 {
                                     "title": "Root tag",
                                     "title_sv": "Roottagg",
-                                    "description": "",
-                                    "description_sv": "",
                                     "type": "string",
                                     "enum": ["root"],
                 					"class": "typewriter"
@@ -287,6 +287,8 @@
                 "lexical_attributes": {
                     "title": "Lexical analysis",
                     "title_sv": "Lexikalanalys",
+                    "description": "Attributes for the lexical analysis",
+                    "description_sv": "Attribut för lexikalanalysen",
                     "type": "array",
                     "default": ["pos", "msd", "lemma", "lex", "saldo"],
                     "items": {
@@ -300,6 +302,8 @@
                 "compound_attributes": {
                     "title": "Compound analysis",
                     "title_sv": "Sammansättningsanalys",
+                    "description": "Attributes for the compound analysis",
+                    "description_sv": "Attribut för sammansättningsanalysen",
                     "type": "array",
                     "default": ["prefix", "suffix"],
                     "items": {
@@ -313,6 +317,8 @@
                 "dependency_attributes": {
                     "title": "Dependency analysis",
                     "title_sv": "Dependensanalys",
+                    "description": "Attributes for the dependency analysis",
+                    "description_sv": "Attribut the dependsanalysen",
                     "type": "array",
                     "default": ["ref", "dephead", "deprel"],
                     "items": {
