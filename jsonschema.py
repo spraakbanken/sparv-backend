@@ -6,7 +6,6 @@ supported JSON Schema versions.
 
 Most commonly, :func:`validate` is the quickest way to simply validate a given
 instance under a schema, and will create a validator for you.
-
 """
 
 from __future__ import division, unicode_literals
@@ -37,25 +36,17 @@ else:
 
 
 class UnknownType(Exception):
-    """
-    An unknown type was given.
-
-    """
+    """An unknown type was given."""
 
 
 class InvalidRef(Exception):
-    """
-    An invalid reference was given.
-
-    """
+    """An invalid reference was given."""
 
 
 class SchemaError(Exception):
     """
     The provided schema is malformed.
-
     The same attributes exist for ``SchemaError``s as for ``ValidationError``s.
-
     """
 
     def __init__(self, message, validator=None, path=()):
@@ -74,7 +65,6 @@ class ValidationError(Exception):
         * ``path`` : a list containing the path to the offending element (or []
                      if the error happened globally) in *reverse* order (i.e.
                      deepest index first).
-
     """
 
     def __init__(self, message, validator=None, path=()):
@@ -87,14 +77,11 @@ class ValidationError(Exception):
 
 
 class Draft3Validator(object):
-    """
-    A validator for JSON Schema draft 3.
-
-    """
+    """A validator for JSON Schema draft 3."""
 
     DEFAULT_TYPES = {
-        "array" : list, "boolean" : bool, "integer" : int, "null" : type(None),
-        "number" : (int, float), "object" : dict, "string" : basestring,
+        "array": list, "boolean": bool, "integer": int, "null": type(None),
+        "number": (int, float), "object": dict, "string": basestring,
     }
 
     def __init__(self, schema, types=(), resolver=None):
@@ -115,9 +102,7 @@ class Draft3Validator(object):
 
         ``resolver`` is an object that knows how to resolve JSON Schema refs.
         If not specified it is an instance of :class:`RefResolver`.
-
         """
-
         self._types = dict(self.DEFAULT_TYPES)
         self._types.update(types)
         self._types["any"] = tuple(self._types.values())
@@ -129,11 +114,7 @@ class Draft3Validator(object):
         self.schema = schema
 
     def is_type(self, instance, type):
-        """
-        Check if an ``instance`` is of the provided (JSON Schema) ``type``.
-
-        """
-
+        """Check if an ``instance`` is of the provided (JSON Schema) ``type``."""
         if type not in self._types:
             raise UnknownType(type)
         type = self._types[type]
@@ -148,21 +129,14 @@ class Draft3Validator(object):
     def is_valid(self, instance, _schema=None):
         """
         Check if the ``instance`` is valid under the current schema.
-
         Returns a bool indicating whether validation succeeded.
-
         """
-
         error = next(self.iter_errors(instance, _schema), None)
         return error is None
 
     @classmethod
     def check_schema(cls, schema):
-        """
-        Validate a ``schema`` against the meta-schema to see if it is valid.
-
-        """
-
+        """Validate a ``schema`` against the meta-schema to see if it is valid."""
         for error in cls(cls.META_SCHEMA).iter_errors(schema):
             raise SchemaError(
                 error.message, validator=error.validator, path=error.path,
@@ -182,7 +156,6 @@ class Draft3Validator(object):
             ...     print(error)
             4 is not one of [1, 2, 3]
             [2, 3, 4] is too long
-
         """
 
         if _schema is None:
@@ -202,11 +175,7 @@ class Draft3Validator(object):
                 yield error
 
     def validate(self, *args, **kwargs):
-        """
-        Validate an ``instance`` under the given ``schema``.
-
-        """
-
+        """Validate an ``instance`` under the given ``schema``."""
         for error in self.iter_errors(*args, **kwargs):
             raise error
 
@@ -220,9 +189,9 @@ class Draft3Validator(object):
                 self.is_type(type, "object") and
                 self.is_valid(instance, type)
 
-            # Or we have a type as a string, just check if the instance is that
-            # type. Also, HACK: we can reach the `or` here if skip_types is
-            # something other than error. If so, bail out.
+                # Or we have a type as a string, just check if the instance is that
+                # type. Also, HACK: we can reach the `or` here if skip_types is
+                # something other than error. If so, bail out.
 
             ) or (
                 self.is_type(type, "string") and
@@ -396,7 +365,7 @@ class Draft3Validator(object):
 
     def validate_disallow(self, disallow, instance, schema):
         for disallowed in _list(disallow):
-            if self.is_valid(instance, {"type" : [disallowed]}):
+            if self.is_valid(instance, {"type": [disallowed]}):
                 yield ValidationError(
                     "%r is disallowed for %r" % (disallowed, instance)
                 )
@@ -415,94 +384,91 @@ class Draft3Validator(object):
 
 
 Draft3Validator.META_SCHEMA = {
-    "$schema" : "http://json-schema.org/draft-03/schema#",
-    "id" : "http://json-schema.org/draft-03/schema#",
-    "type" : "object",
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
 
-    "properties" : {
-        "type" : {
-            "type" : ["string", "array"],
-            "items" : {"type" : ["string", {"$ref" : "#"}]},
-            "uniqueItems" : True,
-            "default" : "any"
+    "properties": {
+        "type": {
+            "type": ["string", "array"],
+            "items": {"type": ["string", {"$ref": "#"}]},
+            "uniqueItems": True,
+            "default": "any"
         },
-        "properties" : {
-            "type" : "object",
-            "additionalProperties" : {"$ref" : "#", "type": "object"},
-            "default" : {}
+        "properties": {
+            "type": "object",
+            "additionalProperties": {"$ref": "#", "type": "object"},
+            "default": {}
         },
-        "patternProperties" : {
-            "type" : "object",
-            "additionalProperties" : {"$ref" : "#"},
-            "default" : {}
+        "patternProperties": {
+            "type": "object",
+            "additionalProperties": {"$ref": "#"},
+            "default": {}
         },
-        "additionalProperties" : {
-            "type" : [{"$ref" : "#"}, "boolean"], "default" : {}
+        "additionalProperties": {
+            "type": [{"$ref": "#"}, "boolean"], "default": {}
         },
-        "items" : {
-            "type" : [{"$ref" : "#"}, "array"],
-            "items" : {"$ref" : "#"},
-            "default" : {}
+        "items": {
+            "type": [{"$ref": "#"}, "array"],
+            "items": {"$ref": "#"},
+            "default": {}
         },
-        "additionalItems" : {
-            "type" : [{"$ref" : "#"}, "boolean"], "default" : {}
+        "additionalItems": {
+            "type": [{"$ref": "#"}, "boolean"], "default": {}
         },
-        "required" : {"type" : "boolean", "default" : False},
-        "dependencies" : {
-            "type" : ["string", "array", "object"],
-            "additionalProperties" : {
-                "type" : ["string", "array", {"$ref" : "#"}],
-                "items" : {"type" : "string"}
+        "required": {"type": "boolean", "default": False},
+        "dependencies": {
+            "type": ["string", "array", "object"],
+            "additionalProperties": {
+                "type": ["string", "array", {"$ref": "#"}],
+                "items": {"type": "string"}
             },
-            "default" : {}
+            "default": {}
         },
-        "minimum" : {"type" : "number"},
-        "maximum" : {"type" : "number"},
-        "exclusiveMinimum" : {"type" : "boolean", "default" : False},
-        "exclusiveMaximum" : {"type" : "boolean", "default" : False},
-        "minItems" : {"type" : "integer", "minimum" : 0, "default" : 0},
-        "maxItems" : {"type" : "integer", "minimum" : 0},
-        "uniqueItems" : {"type" : "boolean", "default" : False},
-        "pattern" : {"type" : "string", "format" : "regex"},
-        "minLength" : {"type" : "integer", "minimum" : 0, "default" : 0},
-        "maxLength" : {"type" : "integer"},
-        "enum" : {"type" : "array", "minItems" : 1, "uniqueItems" : True},
-        "default" : {"type" : "any"},
-        "title" : {"type" : "string"},
-        "description" : {"type" : "string"},
-        "format" : {"type" : "string"},
-        "maxDecimal" : {"type" : "number", "minimum" : 0},
-        "divisibleBy" : {
-            "type" : "number",
-            "minimum" : 0,
-            "exclusiveMinimum" : True,
-            "default" : 1
+        "minimum": {"type": "number"},
+        "maximum": {"type": "number"},
+        "exclusiveMinimum": {"type": "boolean", "default": False},
+        "exclusiveMaximum": {"type": "boolean", "default": False},
+        "minItems": {"type": "integer", "minimum": 0, "default": 0},
+        "maxItems": {"type": "integer", "minimum": 0},
+        "uniqueItems": {"type": "boolean", "default": False},
+        "pattern": {"type": "string", "format": "regex"},
+        "minLength": {"type": "integer", "minimum": 0, "default": 0},
+        "maxLength": {"type": "integer"},
+        "enum": {"type": "array", "minItems": 1, "uniqueItems": True},
+        "default": {"type": "any"},
+        "title": {"type": "string"},
+        "description": {"type": "string"},
+        "format": {"type": "string"},
+        "maxDecimal": {"type": "number", "minimum": 0},
+        "divisibleBy": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": True,
+            "default": 1
         },
-        "disallow" : {
-            "type" : ["string", "array"],
-            "items" : {"type" : ["string", {"$ref" : "#"}]},
-            "uniqueItems" : True
+        "disallow": {
+            "type": ["string", "array"],
+            "items": {"type": ["string", {"$ref": "#"}]},
+            "uniqueItems": True
         },
-        "extends" : {
-            "type" : [{"$ref" : "#"}, "array"],
-            "items" : {"$ref" : "#"},
-            "default" : {}
+        "extends": {
+            "type": [{"$ref": "#"}, "array"],
+            "items": {"$ref": "#"},
+            "default": {}
         },
-        "id" : {"type" : "string", "format" : "uri"},
-        "$ref" : {"type" : "string", "format" : "uri"},
-        "$schema" : {"type" : "string", "format" : "uri"},
+        "id": {"type": "string", "format": "uri"},
+        "$ref": {"type": "string", "format": "uri"},
+        "$schema": {"type": "string", "format": "uri"},
     },
-    "dependencies" : {
-        "exclusiveMinimum" : "minimum", "exclusiveMaximum" : "maximum"
+    "dependencies": {
+        "exclusiveMinimum": "minimum", "exclusiveMaximum": "maximum"
     },
 }
 
 
 class RefResolver(object):
-    """
-    Resolve JSON Schema refs.
-
-    """
+    """Resolve JSON Schema refs."""
 
     def __init__(self, store=None, get_page=urlopen):
         if store is None:
@@ -512,11 +478,7 @@ class RefResolver(object):
         self.store = store
 
     def resolve(self, root_schema, ref):
-        """
-        Resolve a ``ref`` within the context of the ``root_schema``.
-
-        """
-
+        """Resolve a ``ref`` within the context of the ``root_schema``."""
         if ref in self.store:
             return self.store[ref]
         elif ref.startswith("#"):
@@ -525,11 +487,7 @@ class RefResolver(object):
             return json.load(self.get_page(ref))
 
     def resolve_relative(self, schema, ref):
-        """
-        Resolve a relative ``ref`` within the given ``schema``.
-
-        """
-
+        """Resolve a relative ``ref`` within the given ``schema``."""
         if ref == "#":
             return schema
 
@@ -547,10 +505,7 @@ class RefResolver(object):
 
 
 class ErrorTree(object):
-    """
-    ErrorTrees make it easier to check which validations failed.
-
-    """
+    """ErrorTrees make it easier to check which validations failed."""
 
     def __init__(self, errors=()):
         self.errors = {}
@@ -566,11 +521,7 @@ class ErrorTree(object):
         return k in self._contents
 
     def __getitem__(self, k):
-        """
-        Retrieve the child tree with key ``k``.
-
-        """
-
+        """Retrieve the child tree with key ``k``."""
         return self._contents[k]
 
     def __setitem__(self, k, v):
@@ -587,11 +538,7 @@ class ErrorTree(object):
 
     @property
     def total_errors(self):
-        """
-        The total number of errors in the entire tree, including children.
-
-        """
-
+        """The total number of errors in the entire tree, including children."""
         child_errors = sum(len(tree) for _, tree in iteritems(self._contents))
         return len(self.errors) + child_errors
 
@@ -604,9 +551,7 @@ def _find_additional_properties(instance, schema):
     / or ``patternProperties``.
 
     Assumes ``instance`` is dict-like already.
-
     """
-
     properties = schema.get("properties", {})
     patterns = "|".join(schema.get("patternProperties", {}))
     for property in instance:
@@ -617,11 +562,7 @@ def _find_additional_properties(instance, schema):
 
 
 def _extras_msg(extras):
-    """
-    Create an error message for extra items or properties.
-
-    """
-
+    """Create an error message for extra items or properties."""
     if len(extras) == 1:
         verb = "was"
     else:
@@ -637,9 +578,7 @@ def _types_msg(instance, types):
     be considered to be a description of that object and used as its type.
 
     Otherwise the message is simply the reprs of the given ``types``.
-
     """
-
     reprs = []
     for type in types:
         try:
@@ -657,9 +596,7 @@ def _flatten(suitable_for_isinstance):
         * an arbitrary nested tree of tuples
 
     Return a flattened tuple of the given argument.
-
     """
-
     types = set()
 
     if not isinstance(suitable_for_isinstance, tuple):
@@ -675,11 +612,8 @@ def _flatten(suitable_for_isinstance):
 def _list(thing):
     """
     Wrap ``thing`` in a list if it's a single str.
-
     Otherwise, return it unchanged.
-
     """
-
     if isinstance(thing, basestring):
         return [thing]
     return thing
@@ -688,11 +622,8 @@ def _list(thing):
 def _delist(thing):
     """
     Unwrap ``thing`` to a single element if its a single str in a list.
-
     Otherwise, return it unchanged.
-
     """
-
     if (
         isinstance(thing, list) and
         len(thing) == 1
@@ -703,11 +634,7 @@ def _delist(thing):
 
 
 def _unbool(element, true=object(), false=object()):
-    """
-    A hack to make True and 1 and False and 0 unique for _uniq.
-
-    """
-
+    """A hack to make True and 1 and False and 0 unique for _uniq."""
     if element is True:
         return true
     elif element is False:
@@ -721,10 +648,7 @@ def _uniq(container):
 
     Successively tries first to rely that the elements are hashable, then
     falls back on them being sortable, and finally falls back on brute
-    force.
-
-    """
-
+    force."""
     try:
         return len(set(_unbool(i) for i in container)) == len(container)
     except TypeError:
@@ -757,9 +681,6 @@ def validate(instance, schema, cls=Draft3Validator, *args, **kwargs):
     By default this is a draft 3 validator.  Any other provided positional and
     keyword arguments will be provided to this class when constructing a
     validator.
-
     """
-
-
     cls.check_schema(schema)
     cls(schema, *args, **kwargs).validate(instance)

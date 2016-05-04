@@ -329,9 +329,9 @@ class Build(object):
                 filelike = StringIO.StringIO()
                 with zipfile.ZipFile(filelike, 'w', compression=zipfile.ZIP_DEFLATED) as zipflike:
                     for root, _dirs, files in os.walk(self.export_dir):
-                            for xml in files:
-                                zipflike.write(os.path.join(root, xml), arcname="korpus/" + xml)
-                                zipf.write(os.path.join(root, xml), arcname="korpus/" + xml)
+                            for xmlfile in files:
+                                zipflike.write(os.path.join(root, xmlfile), arcname="korpus/" + xmlfile)
+                                zipf.write(os.path.join(root, xmlfile), arcname="korpus/" + xmlfile)
                 return filelike
             else:
                 # används inte just nu

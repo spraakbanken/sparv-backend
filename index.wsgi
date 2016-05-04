@@ -1,5 +1,7 @@
 # -*- mode: python; coding: utf-8 -*-
-import sys, os, logging
+import sys
+import os
+import logging
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 if THIS_DIR not in sys.path:
@@ -18,7 +20,7 @@ if __name__ == "__main__":
 ################################################################################
 
 
-logging.basicConfig(filename = log_file_location, format = "%(asctime)-15s %(message)s")
+logging.basicConfig(filename=log_file_location, format="%(asctime)-15s %(message)s")
 log = logging.getLogger('pipeline')
 log.setLevel(logging.INFO)
 log.info("Restarted index.wsgi")
@@ -28,7 +30,7 @@ for path in paths:
     if path not in sys.path:
         sys.path.append(path)
 
-os.environ['PYTHONPATH'] = ":".join(filter(lambda s : s, sys.path))
+os.environ['PYTHONPATH'] = ":".join(filter(lambda s: s, sys.path))
 
 # Loading handlers
 try:
@@ -51,7 +53,8 @@ except:
     builds = dict()
 
 # Global request counter
-requests=0
+requests = 0
+
 
 def application(environ, start_response):
     """
@@ -59,16 +62,16 @@ def application(environ, start_response):
     """
 
     global requests
-    requests+=1
+    requests += 1
     request = int(requests)
 
-    path = environ.get('PATH_INFO',"")
+    path = environ.get('PATH_INFO', "")
     cmd = path.rstrip('/')
 
     log.info("Handling %s (request %s)" % (path, request))
 
     status = "200 OK"
-    
+
     # for file upload
     if environ['REQUEST_METHOD'] == 'OPTIONS':
         response_headers = [('Content-type', 'text/plain'),
@@ -93,6 +96,7 @@ def application(environ, start_response):
     except:
         log.exception("Error in handler code")
         return ["Error in handler code: %s\n", make_trace()]
+
 
 if __name__ == "__main__":
     """

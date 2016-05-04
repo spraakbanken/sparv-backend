@@ -12,8 +12,10 @@ from build import Build
 
 log = logging.getLogger('pipeline.' + __name__)
 
+
 def get_immediate_subdirectories(directory):
     return os.walk(directory).next()[1]
+
 
 def resume_builds():
     builds = {}

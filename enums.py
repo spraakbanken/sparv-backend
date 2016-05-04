@@ -1,5 +1,6 @@
 # Enums used in the pipeline
 
+
 def enum(*sequential):
     """
     Makes an enumerator type: http://stackoverflow.com/a/1695250/165544
@@ -13,6 +14,7 @@ Status = enum('Init', 'Parsing', 'Running', 'Done', 'Error', 'ParseError', 'Dele
 
 # The possible message types from the pipeline
 Message = enum('StatusChange', 'Increment')
+
 
 def finished(status):
     """The statuses that signify a finished build"""
