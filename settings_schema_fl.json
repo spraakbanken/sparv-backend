@@ -47,7 +47,7 @@
             "title": "Analysis mode",
             "title_sv": "Analysmode",
             "default": "en",
-            "enum": ["as", "ca", "cy", "de", "en", "es", "fr", "gl", "it", "pt", "ru", "sl"],
+            "enum": ["as", "ca", "cy", "en", "es", "fr", "gl", "it", "no", "pt", "ru", "sl"],
             "type": "string"
         },
 
