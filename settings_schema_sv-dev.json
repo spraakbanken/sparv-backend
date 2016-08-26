@@ -295,7 +295,7 @@
             "type": "object",
             "default":  {"dependency_attributes": ["ref", "dephead", "deprel"],
                         "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense"],
-                        "compound_attributes": ["complemgram", "compwf", "lemprob"]
+                        "compound_attributes": ["complemgram", "compwf"]
                         },
             "properties": {
 
@@ -320,12 +320,12 @@
                     "description": "Attributes for the compound analysis",
                     "description_sv": "Attribut för sammansättningsanalysen",
                     "type": "array",
-                    "default": ["complemgram", "compwf", "lemprob"],
+                    "default": ["complemgram", "compwf"],
                     "items": {
                         "title": "Attribute",
                         "title_sv": "Attribut",
                         "type": "string",
-                        "enum": ["complemgram", "compwf", "lemprob"]
+                        "enum": ["complemgram", "compwf"]
                     }
                 },
 
