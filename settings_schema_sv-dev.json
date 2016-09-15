@@ -333,7 +333,7 @@
                     "title": "Dependency analysis",
                     "title_sv": "Dependensanalys",
                     "description": "Attributes for the dependency analysis",
-                    "description_sv": "Attribut the dependsanalysen",
+                    "description_sv": "Attribut för dependsanalysen",
                     "type": "array",
                     "default": ["ref", "dephead", "deprel"],
                     "items": {
