@@ -279,7 +279,7 @@
             "description_sv": "Positionella attribut som ska genereras i analysen. Attribut som har valts under 'ordtagg' får inte förekomma här.",
             "type": "object",
             "default": {"dependency_attributes": ["ref", "dephead", "deprel"],
-                        "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense"],
+                        "lexical_attributes": ["pos", "msd", "lemma", "lex", "saldo"],
                         "compound_attributes": ["prefix", "suffix"]
                        },
             "properties": {
@@ -290,12 +290,12 @@
                     "description": "Attributes for the lexical analysis",
                     "description_sv": "Attribut för lexikalanalysen",
                     "type": "array",
-                    "default": ["pos", "msd", "lemma", "lex", "sense"],
+                    "default": ["pos", "msd", "lemma", "lex", "saldo"],
                     "items": {
                         "title": "Attribute",
                         "title_sv": "Attribut",
                         "type": "string",
-                        "enum": ["pos", "msd", "lemma", "lex", "sense"]
+                        "enum": ["pos", "msd", "lemma", "lex", "saldo"]
                     }
                 },
 

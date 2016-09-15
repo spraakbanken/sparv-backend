@@ -214,7 +214,7 @@ def make_Makefile(settings):
                    ('msd', 'msd'),
                    ('baseform', 'lemma'),
                    ('lemgram', 'lex'),
-                   ('sense', 'sense'),
+                   ('saldo', 'saldo'),
                    ('prefix', 'prefix'),
                    ('suffix', 'suffix'),
                    ('ref', 'ref'),

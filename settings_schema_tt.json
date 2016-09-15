@@ -55,7 +55,7 @@
             "title": "Text language",
             "title_sv": "Språket av texten",
             "default": "de",
-            "enum": ["de", "bg", "nl", "la", "pl", "sk", "et", "fi"],
+            "enum": ["de", "bg", "et", "fi", "la", "nl", "pl", "ro", "sk"],
             "type": "string"
         },
 
