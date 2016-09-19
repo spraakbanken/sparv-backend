@@ -131,7 +131,7 @@ def status(builds):
     return [res]
 
 
-def cleanup(builds, timeout=86400, remove_errors=False):
+def cleanup(builds, timeout=604800, remove_errors=False):
     """
     The /cleanup handler.
     Remove builds that are finished and haven't been accessed within the timeout,
