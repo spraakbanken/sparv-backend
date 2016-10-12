@@ -405,9 +405,9 @@ def send_result_mail(adress, link):
     server = "localhost"
     fromadress = "noreply@spraakbanken.gu.se"
     subject = "Your corpus is done!"
-    txt = "Dear Annotation Lab User,\n\n"
+    txt = "Dear Sparv User,\n\n"
     txt += "You can download the annotated corpus by clicking on the following link:\n\n" + link
-    txt += "\n\nYours,\nAnnotation Lab\nhttp://spraakbanken.gu.se/korp/annoteringslabb"
+    txt += "\n\nYours,\nSparv\nhttp://spraakbanken.gu.se/sparv"
 
     # Prepare actual message
     message = "\From: %s\nTo: %s\nSubject: %s\n\n%s" % (fromadress, ", ".join(toadress), subject, txt)
