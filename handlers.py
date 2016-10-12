@@ -403,11 +403,11 @@ def send_result_mail(adress, link):
     toadress = [i.strip() for i in toadress]
 
     server = "localhost"
-    fromadress = "noreply@spraakbanken.gu.se"
+    fromadress = "sb-sparv@svenska.gu.se"
     subject = "Your corpus is done!"
     txt = "Dear Sparv User,\n\n"
     txt += "You can download the annotated corpus by clicking on the following link:\n\n" + link
-    txt += "\n\nYours,\nSparv\nhttp://spraakbanken.gu.se/sparv"
+    txt += "\n\nYours,\nSparv\nhttp://spraakbanken.gu.se/sparv\nsb-sparv@svenska.gu.se"
 
     # Prepare actual message
     message = "\From: %s\nTo: %s\nSubject: %s\n\n%s" % (fromadress, ", ".join(toadress), subject, txt)
@@ -434,15 +434,15 @@ def send_crash_mail(adress, hashnumber, warnings):
     toadress = [i.strip() for i in toadress]
 
     server = "localhost"
-    fromadress = "noreply@spraakbanken.gu.se"
+    fromadress = "sb-sparv@svenska.gu.se"
 
     subject = "The analysis of your corpus crashed"
     txt = []
-    txt.append(u"Dear Annotation Lab User,\n")
+    txt.append(u"Dear Sparv User,\n")
     txt.append(u"Unfortunately, something went wrong with the analysis of your corpus (hashnumber: %s)." % hashnumber)
     txt.append(u"When you upload files, please make sure that they are either text files or that they contain valid XML.")
-    txt.append(u"If you don't know what went wrong and you would like Språkbanken to help you with this problem, please forward this email to sb-info@svenska.gu.se")
-    txt.append(u"\nYours,\nAnnotation Lab\nhttp://spraakbanken.gu.se/korp/annoteringslabb")
+    txt.append(u"If you don't know what went wrong and you would like Språkbanken to help you with this problem, please forward this email to sb-sparv@svenska.gu.se")
+    txt.append(u"\nYours,\nSparv\nhttp://spraakbanken.gu.se/sparv\nsb-sparv@svenska.gu.se")
 
     if warnings:
         txt.append("\n\nCrash report:\n")
