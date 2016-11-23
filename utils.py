@@ -12,24 +12,25 @@ import urlparse
 log = logging.getLogger('pipeline.' + __name__)
 
 # Dictionary defining the analysis mode for each languages
-# tt = TreeTagger, fl = Freeling
+# tt = TreeTagger
+# fl = Freeling  # FreeLing
 TOOL_DICT = {
     "sv": "sv",
     "sv-dev": "sv-dev",
     "sv-1800": "sv-1800",
-    "as": "fl",
-    "ca": "fl",
-    "cy": "fl",
-    "en": "fl",
-    "de": "fl",
-    "es": "fl",
-    "fr": "fl",
-    "gl": "fl",
-    "it": "fl",
-    "no": "fl",
-    "pt": "fl",
-    "ru": "fl",
-    "sl": "fl",
+    "as": "fl",  # FreeLing
+    "ca": "fl",  # FreeLing
+    "cy": "fl",  # FreeLing
+    "en": "fl",  # FreeLing
+    "de": "fl",  # FreeLing
+    "es": "fl",  # FreeLing
+    "fr": "fl",  # FreeLing
+    "gl": "fl",  # FreeLing
+    "it": "fl",  # FreeLing
+    "no": "fl",  # FreeLing
+    "pt": "fl",  # FreeLing
+    "ru": "fl",  # FreeLing
+    "sl": "fl",  # FreeLing
     "bg": "tt",
     "et": "tt",
     "fi": "tt",

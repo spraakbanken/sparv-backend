@@ -34,7 +34,7 @@ class Config(object):
     # Location of the JSON schema for makefile settings
     sv_schema = os.path.join(al_backend, 'settings_schema_sv.json')
     sv_dev_schema = os.path.join(al_backend, 'settings_schema_sv-dev.json')
-    fl_schema = os.path.join(al_backend, 'settings_schema_fl.json')
+    fl_schema = os.path.join(al_backend, 'settings_schema_fl.json')  # FreeLing
     tt_schema = os.path.join(al_backend, 'settings_schema_tt.json')
 
     api_json = os.path.join(al_backend, 'api.json')

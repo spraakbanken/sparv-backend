@@ -97,8 +97,8 @@ def schema(environ):
         analysis = "sv"
     if analysis == "tt":
         schema_file = Config.tt_schema
-    elif analysis == "fl":
-        schema_file = Config.fl_schema
+    elif analysis == "fl":  # FreeLing
+        schema_file = Config.fl_schema  # FreeLing
     elif analysis == "sv-dev":
         schema_file = Config.sv_dev_schema
     else:
@@ -471,8 +471,8 @@ def handle(builds, environ, cmd=None):
         analysis = "sv"
     if analysis == "tt":
         schema_file = Config.tt_schema
-    elif analysis == "fl":
-        schema_file = Config.fl_schema
+    elif analysis == "fl":  # FreeLing
+        schema_file = Config.fl_schema  # FreeLing
     elif analysis == "sv-dev":
         schema_file = Config.sv_dev_schema
     else:

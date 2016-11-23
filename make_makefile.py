@@ -285,9 +285,9 @@ def make_Makefile(settings):
     # Add the root tag to xml and its attributes
     add_structural_attributes(text, settings['root']['attributes'], add_xml=True)
 
-    # Add freeling xml annotations
-    if analysis == "fl":
-        xml_cols.extend([("s", "sentence"), ("w", "token"), ("w:pos", "token.pos"), ("w:msd", "token.msd"), ("w:lemma", "token.baseform")])
+    # Add freeling xml annotations  # FreeLing
+    if analysis == "fl":  # FreeLing
+        xml_cols.extend([("s", "sentence"), ("w", "token"), ("w:pos", "token.pos"), ("w:msd", "token.msd"), ("w:lemma", "token.baseform")])  # FreeLing
 
     # Assemble the makefile
     rows = (["include ../Makefile.config",
@@ -326,9 +326,9 @@ def make_Makefile(settings):
         for custom in custom_rules:
             rows += [makefile_comment("Custom rule for " + custom[0] + ":"), custom[1], ""]
 
-    # Add xml custom rule for freeling languages
-    if analysis == "fl":
-        custom_rule_names.append("xml")
+    # Add xml custom rule for freeling languages  # FreeLing
+    if analysis == "fl":  # FreeLing
+        custom_rule_names.append("xml")  # FreeLing
 
     if len(custom_rule_names) > 0:
         rows += [("custom_rules", ' '.join(custom_rule_names)), ""]
