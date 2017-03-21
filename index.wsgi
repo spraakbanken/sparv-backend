@@ -11,7 +11,7 @@ from config import Config
 
 ################################################################################
 # Pythonpaths to the sb python directory, and to the the directory of this script.
-paths = [Config.sb_python, Config.al_backend]
+paths = [Config.sparv_python, Config.sparv_backend]
 
 # The log file location. Set this to None if you rather want to log to stdout
 log_file_location = Config.log_file
