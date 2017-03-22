@@ -212,7 +212,8 @@ class Build(object):
                          "python=%s" % Config.python_interpreter]
 
         # First set up some environment variables
-        os.environ['SB_MODELS'] = Config.sparv_models
+        os.environ['SPARV_MODELS'] = Config.sparv_models
+        os.environ['SPARV_MAKEFILES'] = Config.sparv_makefiles
 
         # For initial parsing
         make_init = ['@TEXT'] + make_settings
