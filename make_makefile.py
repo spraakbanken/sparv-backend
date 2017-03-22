@@ -182,7 +182,7 @@ def make_Makefile(settings):
 
     # vrt_columns[_annotations] as column-by-column, initially with default settings
 
-    if analysis == "tt" or "fl":
+    if analysis == ("tt" or "fl"):
         columns = [('word', 'word'),
                    ('pos', 'pos'),
                    ('msd', 'msd'),
