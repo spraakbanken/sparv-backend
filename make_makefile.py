@@ -182,13 +182,7 @@ def make_Makefile(settings):
 
     # vrt_columns[_annotations] as column-by-column, initially with default settings
 
-    if analysis == "tt":
-        columns = [('word', 'word'),
-                   ('pos', 'pos'),
-                   ('msd', 'msd'),
-                   ('baseform', 'lemma')]
-
-    elif analysis == "fl":
+    if analysis == "tt" or "fl":
         columns = [('word', 'word'),
                    ('pos', 'pos'),
                    ('msd', 'msd'),
@@ -290,10 +284,9 @@ def make_Makefile(settings):
         xml_cols.extend([("s", "sentence"), ("w", "token"), ("w:pos", "token.pos"), ("w:msd", "token.msd"), ("w:lemma", "token.baseform")])  # FreeLing
 
     # Assemble the makefile
-    rows = (["include ../Makefile.config",
+    rows = (["include $(SPARV_MAKEFILES)/Makefile.config",
             ("corpus", settings['corpus']),  # TODO: escaping of non-filename characters!
-             ("original_dir", "original"),
-             ("files", "$(basename $(notdir $(wildcard $(original_dir)/*.xml)))")
+            ("original_dir", "original")
              ])
 
     # Add language and analysis mode if necessary
@@ -333,7 +326,7 @@ def make_Makefile(settings):
     if len(custom_rule_names) > 0:
         rows += [("custom_rules", ' '.join(custom_rule_names)), ""]
 
-    rows.extend(["include ../Makefile.rules"])
+    rows.extend(["include $(SPARV_MAKEFILES)/Makefile.rules"])
 
     return rows
 
