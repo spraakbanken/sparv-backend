@@ -23,7 +23,8 @@ class Config(object):
     builds_dir = os.path.join(os.path.dirname(__file__), 'builds')
 
     # The log file location. Set this to None if you rather want to log to stdout
-    log_file = os.path.join(builds_dir, 'annotate.log')
+    log_dir = os.path.join(builds_dir, 'log')
+    log_file = os.path.join(log_dir, 'backend.log')
 
     # Where the models and makefiles are hosted (SPARV_MODELS, SPARV_MAKEFILES)
     sparv_models = os.path.join(pipeline_dir, 'models')

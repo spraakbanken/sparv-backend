@@ -19,6 +19,11 @@ if __name__ == "__main__":
     log_file_location = None
 ################################################################################
 
+# Create logdir if it does not exist
+if log_file_location:
+    log_file_dir = os.path.dirname(log_file_location)
+    if not os.path.exists(log_file_dir):
+        os.makedirs(log_file_dir, mode=0777)
 
 logging.basicConfig(filename=log_file_location, format="%(asctime)-15s %(message)s")
 log = logging.getLogger('pipeline')
