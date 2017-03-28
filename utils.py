@@ -80,6 +80,17 @@ def text(environ):
         return query(environ, 'text', '')
 
 
+def is_sha1(instring):
+    """Check if instring is sha1 hash."""
+    if len(instring) != 40:
+        return False
+    try:
+        int(instring, 16)
+    except ValueError:
+        return False
+    return True
+
+
 def make_hash(*texts):
     """
     The text is hashed together with its makefile because the built corpus

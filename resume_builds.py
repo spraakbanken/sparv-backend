@@ -9,12 +9,14 @@ import os
 
 from config import Config
 from build import Build
+from utils import is_sha1
 
 log = logging.getLogger('pipeline.' + __name__)
 
 
 def get_immediate_subdirectories(directory):
-    return os.walk(directory).next()[1]
+    dirlist = os.walk(directory).next()[1]
+    return [d for d in dirlist if is_sha1(d)]
 
 
 def resume_builds():
