@@ -4,6 +4,7 @@ from Queue import Queue
 from threading import Thread
 from xml.sax.saxutils import escape, unescape
 from collections import OrderedDict
+from werkzeug.utils import secure_filename
 
 import logging
 import json
@@ -366,9 +367,11 @@ def get_files(infiles):
             filename = infile.filename[:infile.filename.rfind(".")]
             fileext = infile.filename[infile.filename.rfind("."):]
 
+        # Ensure ASCII filename without white spaces etc.
+        filename = secure_filename(filename)
         original_text = infile.file.read()
 
-        # convert to xml
+        # Convert to xml
         if fileext != ".xml":
             original_text = escape(original_text)
             original_text = "<text>\n" + original_text + "\n</text>"

@@ -30,6 +30,9 @@ class Config(object):
     sparv_models = os.path.join(pipeline_dir, 'models')
     sparv_makefiles = os.path.join(pipeline_dir, 'makefiles')
 
+    # Path to python virtual environment (optional, set to None if not applicable)
+    venv_path = os.path.join(sparv_backend, 'venv/bin/activate_this.py')
+
     # The number of processes (sent as a -j flag to make)
     processes = 2
 

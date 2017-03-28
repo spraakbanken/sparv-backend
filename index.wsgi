@@ -8,6 +8,7 @@ if THIS_DIR not in sys.path:
     sys.path.append(THIS_DIR)
 
 from config import Config
+from utils import mkdir
 
 ################################################################################
 # Pythonpaths to the sb python directory, and to the the directory of this script.
@@ -19,11 +20,20 @@ if __name__ == "__main__":
     log_file_location = None
 ################################################################################
 
+# Create builds directory
+if not os.path.exists(Config.builds_dir):
+    mkdir(Config.builds_dir)
+
 # Create logdir if it does not exist
 if log_file_location:
     log_file_dir = os.path.dirname(log_file_location)
     if not os.path.exists(log_file_dir):
-        os.makedirs(log_file_dir, mode=0777)
+        mkdir(log_file_dir)
+
+# Activate virtual environment
+if Config.venv_path:
+    activate_this = os.path.join(THIS_DIR, Config.venv_path)
+    execfile(activate_this, dict(__file__=activate_this))
 
 logging.basicConfig(filename=log_file_location, format="%(asctime)-15s %(message)s")
 log = logging.getLogger('pipeline')
