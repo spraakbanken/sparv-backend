@@ -137,7 +137,7 @@ def cleanup(builds, timeout=604800, remove_errors=False):
     The /cleanup handler.
     Remove builds that are finished and haven't been accessed within the timeout,
     which is by default 24 hours.
-    With remove_errors, removes the all with status Error.
+    With remove_errors, removes the builds with status Error.
     """
     to_remove = []
     for h, b in builds.iteritems():
@@ -527,8 +527,10 @@ def handle(builds, environ, cmd=None):
                 log.info("Starting a new build with text input procedure")
                 yield "<result>\n"
                 txt = post["text"].value
+                # Escape plain text and give it a root element
                 if settings["textmode"] == "plain":
                     txt = escape(txt)
+                    txt = "<text>" + txt + "</text>"
                 # Check for empty input
                 if not txt:
                     log.exception(ERROR_MSG["empty_input"])

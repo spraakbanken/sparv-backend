@@ -6,6 +6,7 @@ from utils import TOOL_DICT
 import logging
 log = logging.getLogger('pipeline.' + __name__)
 
+DEFAULT_ROOT = "text"
 
 ######################################
 #    Different auxiliary functions   #
@@ -58,12 +59,13 @@ def mk_file_attr(tag, attr):
     return tag + "." + attr
 
 
-def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None):
+def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None, add_xml=True):
     filename = filename or tag
-    xml_attr = mk_xml_attr(tag, attr)
-    file_attr = mk_file_attr(filename, attr)
+    xml_attr = mk_xml_attr(filename, attr)
+    file_attr = mk_file_attr(tag, attr)
     struct_attr = mk_xml_attr(filename, attr)
-    xml_cols.append((xml_attr, file_attr))
+    if add_xml:
+        xml_cols.append((xml_attr, file_attr))
     if structural:
         structs.append((file_attr, struct_attr))
     else:
@@ -263,21 +265,36 @@ def make_Makefile(settings):
         sentence = []
         paragraph = []
 
-    def add_structural_attributes(tag, attributes, add_xml=False):
-        if len(attributes) > 0 or add_xml:
-            xml_cols.append((tag, tag))
+    def add_structural_attributes(tag, attributes, add_xml=False, is_root=False):
+        if add_xml:
+            if is_root:
+                xml_cols.append((tag, DEFAULT_ROOT))
+            else:
+                xml_cols.append((tag, tag))
         if len(attributes) > 0:
             add_parent(tag, parents)
+            if is_root:
+                filename = tag
+                tag = DEFAULT_ROOT
+            else:
+                tag = tag
+                filename = None
             for attr in attributes:
-                add_attribute(tag, attr, xml_cols, structs, columns, structural=True)
+                add_attribute(tag, attr, xml_cols, structs, columns,
+                              structural=True, filename=filename, add_xml=add_xml)
 
     # Extra tags
     if settings.get('extra_tags'):
         for t in settings['extra_tags']:
-            add_structural_attributes(t['tag'], t['attributes'])
+            add_structural_attributes(t['tag'], t['attributes'], add_xml=True)
+
+    # Add text attributes
+    if settings.get('text_attributes'):
+        if "readibility_metrics" in settings['text_attributes']:
+            add_structural_attributes(text, settings['text_attributes']['readibility_metrics'], is_root=True)
 
     # Add the root tag to xml and its attributes
-    add_structural_attributes(text, settings['root']['attributes'], add_xml=True)
+    add_structural_attributes(text, settings['root']['attributes'], add_xml=True, is_root=True)
 
     # Add freeling xml annotations  # FreeLing
     if analysis == "fl":  # FreeLing

@@ -99,6 +99,33 @@
                     }
                 }
             }
+        },
+
+        "text_attributes": {
+            "title": "Text attributes",
+            "title_sv": "Textattribut",
+            "description": "Text attributes to generate in the analysis. Attributes already present under 'Root tag > Structural attributes' must not appear here again.",
+            "description_sv": "Textattribut som ska genereras i analysen. Attribut som har valts under 'Rottagg > Strukturella attribut' får inte förekomma här.",
+            "type": "object",
+            "default":  {"readibility_metrics": ["lix", "ovix", "nk"]
+                        },
+            "properties": {
+
+                "readibility_metrics": {
+                    "title": "Readibility metrics",
+                    "title_sv": "Läsbarhetsindex",
+                    "description": "Attributes for different readibility metrics",
+                    "description_sv": "Attribut för olika sorters läsbarhetsindex",
+                    "type": "array",
+                    "default": ["lix", "ovix", "nk"],
+                    "items": {
+        				"title": "Attribute",
+                        "title_sv": "Attribut",
+                        "type": "string",
+                        "enum": ["lix", "ovix", "nk"]
+                    }
+                }
+            }
         }
     }
 
