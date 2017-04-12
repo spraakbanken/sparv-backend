@@ -11,6 +11,8 @@ import json
 import time
 import cgi
 import smtplib
+import os
+import signal
 
 from build import Build, FILEUPLOAD_EXT
 from config import Config
@@ -18,7 +20,7 @@ from enums import Status, Message, finished
 from make_makefile import makefile
 from make_trace import make_trace
 from schema_utils import DefaultValidator
-from utils import pretty_epoch_time, query, TOOL_DICT, ERROR_MSG
+from utils import pretty_epoch_time, query, get_build_directories, rmdir, TOOL_DICT, ERROR_MSG
 
 log = logging.getLogger('pipeline.' + __name__)
 
@@ -36,7 +38,9 @@ def handlers(builds, environ):
         '/ping': ping,
         '/status': lambda: status(builds),
         '/cleanup': lambda: cleanup(builds),
-        '/cleanup/errors': lambda: cleanup(builds, remove_errors=True)
+        '/cleanup/errors': lambda: cleanup(builds, remove_errors=True),
+        '/cleanup/forceall': lambda: cleanup_all(builds, environ),
+        '/cleanup/kill': lambda: kill_zombies(environ)
     }
 
 
@@ -136,7 +140,7 @@ def cleanup(builds, timeout=604800, remove_errors=False):
     """
     The /cleanup handler.
     Remove builds that are finished and haven't been accessed within the timeout,
-    which is by default 24 hours.
+    which is by default 7 days.
     With remove_errors, removes the builds with status Error.
     """
     to_remove = []
@@ -150,7 +154,69 @@ def cleanup(builds, timeout=604800, remove_errors=False):
     for h in to_remove:
         del builds[h]
         res += "<removed hash='%s'/>\n" % h
+    if not res:
+        res = "<message>No hashes to be removed.</message>"
     return [res]
+
+
+def cleanup_all(builds, environ):
+    """Remove all the existing builds. Requires secret_key parameter in query."""
+    to_remove = []
+    secret_key = query(environ, 'secret_key', '')
+
+    if Config.secret_key and secret_key == Config.secret_key:
+        log.info("Secret key was confirmed. All builds will be removed.")
+        build_dirs = get_build_directories(Config.builds_dir)
+        for hashnumber in build_dirs:
+            b = builds.get(hashnumber, None)
+            log.info("Removing %s" % hashnumber)
+            if b:
+                to_remove.append(hashnumber)
+                b.remove_files()
+            else:
+                rmdir(os.path.join(Config.builds_dir, hashnumber))
+        res = ""
+        for h in to_remove:
+            del builds[h]
+            res += "<removed hash='%s'/>\n" % h
+        if not res:
+            res = "<message>No hashes to be removed.</message>"
+        return [res]
+    else:
+        log.error("Secret key was not supplied or incorrect. No builds removed.")
+        return ["<error>Failed to remove all builds: secret key could not be confirmed.</error>\n"]
+
+
+def kill_zombies(environ):
+    """
+    Find zombie processes and kill them.
+    Requires secret_key and user parameter in query.
+    """
+    user = query(environ, 'user', '')
+    if not user:
+        log.error("No user supplied.")
+        return ["<error>No user supplied.</error>\n"]
+    secret_key = query(environ, 'secret_key', '')
+    if not Config.secret_key or secret_key != Config.secret_key:
+        log.error("Secret key could not be confirmed.")
+        return ["<error>Secret key could not be confirmed.</error>\n"]
+
+    zombies = []
+    for line in os.popen("ps -u %s a" % user):
+        fields = line.split(None, 4)
+        status = fields[2]
+        pid = fields[0]
+        if status == "Z":
+            zombies.append(pid)
+
+    if zombies:
+        for n, pid in enumerate(zombies, start=1):
+            os.kill(int(pid), signal.SIGKILL)
+        log.info("%s zombies killed" % n)
+        return ["<message>%s zombies were killed.</message>" % n]
+    else:
+        log.info("No zombies found")
+        return ["<message>No zombies found.</message>"]
 
 
 def ping():
@@ -410,6 +476,7 @@ def send_result_mail(adress, link):
     subject = "Your corpus is done!"
     txt = "Dear Sparv User,\n\n"
     txt += "You can download the annotated corpus by clicking on the following link:\n\n" + link
+    txt += "\n\nPlease note that the corpus will be removed after seven days."
     txt += "\n\nYours,\nSparv\nhttp://spraakbanken.gu.se/sparv\nsb-sparv@svenska.gu.se"
 
     # Prepare actual message

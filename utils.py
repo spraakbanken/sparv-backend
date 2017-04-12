@@ -82,6 +82,8 @@ def text(environ):
 
 def is_sha1(instring):
     """Check if instring is sha1 hash."""
+    if instring.endswith("-f"):
+        instring = instring[:-2]
     if len(instring) != 40:
         return False
     try:
@@ -89,6 +91,12 @@ def is_sha1(instring):
     except ValueError:
         return False
     return True
+
+
+def get_build_directories(builds_dir):
+    """Get a list of the build directories from the builds dir."""
+    dirlist = os.walk(builds_dir).next()[1]
+    return [d for d in dirlist if is_sha1(d)]
 
 
 def make_hash(*texts):
