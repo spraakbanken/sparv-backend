@@ -229,10 +229,10 @@ def build(builds, original_text, settings, incremental, fmt, files=None):
         build.make_files()
         t = Thread(target=Build.run, args=[build, fmt])
         t.start()
-    elif builds[build.build_hash].status == (Status.Error or Status.ParseError):
-        log.info("Errorneous build found! Retrying...")
-        t = Thread(target=Build.run, args=[build, fmt])
-        t.start()
+    # elif builds[build.build_hash].status == (Status.Error or Status.ParseError):
+    #     log.info("Errorneous build found! Retrying...")
+    #     t = Thread(target=Build.run, args=[build, fmt])
+    #     t.start()
     else:
         build = builds[build.build_hash]
         log.info("Joining existing build (%s) which started at %s" %
