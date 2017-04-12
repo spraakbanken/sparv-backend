@@ -211,7 +211,7 @@ def kill_zombies(environ):
 
     if zombies:
         for n, pid in enumerate(zombies, start=1):
-            os.kill(int(pid), signal.SIGKILL)
+            os.kill(int(pid), signal.SIGHUP)
         log.info("%s zombies killed" % n)
         return ["<message>%s zombies were killed.</message>" % n]
     else:
