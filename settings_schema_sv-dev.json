@@ -246,21 +246,6 @@
 			]
         },
 
-        "named_entity_recognition": {
-            "title": "Named entity recognition",
-            "title_sv": "Namntaggare",
-            "description": "Structural attributes for named entity recognition",
-            "description_sv": "Strukturella attribut for namnigenkänning",
-            "default": ["ex", "type", "subtype"],
-            "type": "array",
-            "items": {
-                "title": "Attribute",
-                "title_sv": "Attribut",
-                "type": "string",
-                "enum": ["ex", "type", "subtype"]
-            }
-        },
-
         "root": {
             "title": "Root tag",
             "title_sv": "Rottagg",
@@ -343,6 +328,21 @@
                         "enum": ["ref", "dephead", "deprel"]
                     }
                 }
+            }
+        },
+
+        "named_entity_recognition": {
+            "title": "Named entity recognition",
+            "title_sv": "Namntaggare",
+            "description": "Structural attributes for named entity recognition",
+            "description_sv": "Strukturella attribut for namnigenkänning",
+            "default": ["ex", "type", "subtype"],
+            "type": "array",
+            "items": {
+                "title": "Attribute",
+                "title_sv": "Attribut",
+                "type": "string",
+                "enum": ["ex", "type", "subtype"]
             }
         },
 
