@@ -7,21 +7,21 @@
         "type": "object",
         "properties": {
             "tag": {
-				"title": "Tag",
+                "title": "Tag",
                 "title_sv": "Tagg",
                 "description": "The identifer of the tag in the XML",
                 "description_sv": "Taggens identifierare i XML:en",
                 "type": "string"
             },
             "attributes": {
-				"title": "Structural attributes",
+                "title": "Structural attributes",
                 "title_sv": "Strukturella attribut",
                 "description": "The attributes of this tag in the XML",
                 "description_sv": "Attribut inom den taggen som ska fångas in från XML:en",
                 "type": "array",
                 "default": [],
                 "items": {
-					"title": "Structural attribute",
+                    "title": "Structural attribute",
                     "title_sv": "Strukturellt attribut",
                     "type": "string"
                 }
@@ -83,7 +83,7 @@
                     "description_sv": "Modellen/verktyget som ska användas till ordsegmenteringen",
                     "type": "string",
                     "enum": ["whitespace", "linebreaks", "blanklines", "default_tokenizer"],
-					"class": "typewriter"
+    "class": "typewriter"
                 },
                 {
                     "title": "Word tag",
@@ -133,7 +133,7 @@
                                                 "custom": "nytt attribut"
                                             }
                                         },
-										"style_enum": "dropdown"
+                                        "style_enum": "dropdown"
                                     }
                                 }
                             }
@@ -165,7 +165,7 @@
                             "type": "string",
                             "default": "default_tokenizer",
                             "enum": ["whitespace", "linebreaks", "blanklines", "default_tokenizer", "punctuation"],
-					        "class": "typewriter"
+                            "class": "typewriter"
                         },
                         "sentence_chunk": {
                             "title": "Sentence chunk",
@@ -212,7 +212,7 @@
                             "type": "string",
                             "default": "blanklines",
                             "enum": ["whitespace", "linebreaks", "blanklines"],
-        					"class": "typewriter"
+                            "class": "typewriter"
                         },
                         "paragraph_chunk": {
                             "title": "Paragraph chunk",
@@ -226,24 +226,24 @@
                                     "title_sv": "Roottagg",
                                     "type": "string",
                                     "enum": ["root"],
-                					"class": "typewriter"
+                                    "class": "typewriter"
                                 },
                                 {"$ref": "#/struct_tag_simple"}
-                			]
+                            ]
                         }
                     }
                 },
-				{"$ref": "#/struct_tag"},
-				{
-					"title": "No segmentation",
+                {"$ref": "#/struct_tag"},
+                {
+                    "title": "No segmentation",
                     "title_sv": "Ingen segmentering",
-					"description": "Use this if there are no sensible paragraphs in the text",
+                    "description": "Use this if there are no sensible paragraphs in the text",
                     "description_sv": "Använd detta alternativ om det inte finns några rimliga stycken i texten",
-					"type": "string",
-					"default": "none",
-					"enum": ["none"]
-				}
-			]
+                    "type": "string",
+                    "default": "none",
+                    "enum": ["none"]
+                }
+    ]
         },
 
         "root": {
@@ -255,9 +255,9 @@
                 "tag": "text",
                 "attributes": []
             },
-			"type": [
-				{"$ref": "#/struct_tag"}
-			]
+            "type": [
+                {"$ref": "#/struct_tag"}
+            ]
         },
 
         "extra_tags": {
@@ -316,7 +316,7 @@
                     "type": "array",
                     "default": ["lix", "ovix", "nk"],
                     "items": {
-        				"title": "Attribute",
+                        "title": "Attribute",
                         "title_sv": "Attribut",
                         "type": "string",
                         "enum": ["lix", "ovix", "nk"]
@@ -325,5 +325,4 @@
             }
         }
     }
-
 }
