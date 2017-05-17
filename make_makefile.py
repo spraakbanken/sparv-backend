@@ -8,6 +8,24 @@ log = logging.getLogger('pipeline.' + __name__)
 
 DEFAULT_ROOT = "text"
 
+# Default column annotations
+COLUMNS = [('word', 'word'),
+           ('pos', 'pos'),
+           ('msd', 'msd'),
+           ('baseform', 'lemma'),
+           ('lemgram', 'lex'),
+           ('saldo', 'saldo'),
+           ('sense', 'sense'),
+           ('prefix', 'prefix'),
+           ('suffix', 'suffix'),
+           ('complemgram', 'complemgram'),
+           ('lemprob', 'lemprob'),
+           ('compwf', 'compwf'),
+           ('ref', 'ref'),
+           ('dephead.ref', 'dephead'),
+           ('deprel', 'deprel')]
+
+
 ######################################
 #    Different auxiliary functions   #
 def is_str_str_tuple(t):
@@ -182,51 +200,16 @@ def make_Makefile(settings):
         lang = 'sv'
     analysis = TOOL_DICT[lang]
 
-    # vrt_columns[_annotations] as column-by-column, initially with default settings
-
-    if analysis == ("tt" or "fl"):
-        columns = [('word', 'word'),
-                   ('pos', 'pos'),
-                   ('msd', 'msd'),
-                   ('baseform', 'lemma')]
-
-    elif analysis == "sv-dev":
-        columns = [('word', 'word'),
-                   ('pos', 'pos'),
-                   ('msd', 'msd'),
-                   ('baseform', 'lemma'),
-                   ('lemgram', 'lex'),
-                   ('sense', 'sense'),
-                   ('complemgram', 'complemgram'),
-                   ('lemprob', 'lemprob'),
-                   ('compwf', 'compwf'),
-                   ('ref', 'ref'),
-                   ('dephead.ref', 'dephead'),
-                   ('deprel', 'deprel')]
-
-    else:
-        columns = [('word', 'word'),
-                   ('pos', 'pos'),
-                   ('msd', 'msd'),
-                   ('baseform', 'lemma'),
-                   ('lemgram', 'lex'),
-                   ('saldo', 'saldo'),
-                   ('prefix', 'prefix'),
-                   ('suffix', 'suffix'),
-                   ('ref', 'ref'),
-                   ('dephead.ref', 'dephead'),
-                   ('deprel', 'deprel')]
-
     # vrt_structs[_annotations]
     structs = []
 
     # Remove positional attributes that should not be generated
     if lang in ["sv", "sv-dev", "sv-1800"]:
-        columns = [c for c in columns if c[1] in settings['positional_attributes']['lexical_attributes']
+        columns = [c for c in COLUMNS if c[1] in settings['positional_attributes']['lexical_attributes']
                    or c[1] in settings['positional_attributes']['compound_attributes']
                    or c[1] in settings['positional_attributes']['dependency_attributes']]
     else:
-        columns = [c for c in columns if c[1] in settings['positional_attributes']['lexical_attributes']]
+        columns = [c for c in COLUMNS if c[1] in settings['positional_attributes']['lexical_attributes']]
 
     # Add obligatory word annotation
     columns.insert(0, ('word', 'word'))
