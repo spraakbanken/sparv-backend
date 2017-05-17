@@ -291,7 +291,7 @@ class Build(object):
 
         self.make_process.stdout.close()
         self.make_process.stderr.close()
-        # self.make_process.wait()
+        self.make_process.wait()
 
         self.change_status(Status.Done)
 
@@ -308,6 +308,9 @@ class Build(object):
             self.stdout = "".join(self.make_out)
             if self.make_process:
                 self.stderr = self.make_process.stderr.read().rstrip()
+                self.make_process.stdout.close()
+                self.make_process.stderr.close()
+                self.make_process.wait()
             self.change_status(Status.Error)
 
     def fix_warnings(self, warnings_str):
