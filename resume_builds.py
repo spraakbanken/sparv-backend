@@ -14,9 +14,11 @@ log = logging.getLogger('pipeline.' + __name__)
 
 def resume_builds():
     builds = {}
-    for d in get_build_directories(Config.builds_dir):
-        log.info("Reattaching build in directory %s", d)
-        build = builds[d] = Build(None, None, init_from_hash=d)
-        t = Thread(target=Build.run, args=[build, "xml"])
-        t.start()
+    def resume_worker():
+        for d in get_build_directories(Config.builds_dir):
+            log.info("Reattaching build in directory %s", d)
+            build = builds[d] = Build(None, None, init_from_hash=d)
+            Build.run(build, 'xml')
+    t = Thread(target=resume_worker, args=[])
+    t.start()
     return builds
