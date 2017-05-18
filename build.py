@@ -96,16 +96,19 @@ class Build(object):
         self.steps = 0
         self.step = 0
 
-    def access(self, resuming):
+    def access(self, resuming=False):
         """
         Update the access time of this build.
         If resuming=True just get the time stamp of the build.
         """
-        if resuming:
+        if not resuming:
             call(['touch', self.accessed_file])
             self.accessed_time = time.time()
         else:
-            self.accessed_time = os.path.getmtime(self.accessed_file)
+            if os.path.exists(self.accessed_file):
+                self.accessed_time = os.path.getmtime(self.accessed_file)
+            else:
+                self.accessed_time = time.time()
 
     def increment_msg(self):
         """The current increment message"""
@@ -168,6 +171,7 @@ class Build(object):
         directories, the original corpus and the makefile
         """
         self.change_status(Status.Init)
+        self.access()
 
         # Make directories
         map(mkdir, [self.directory, self.original_dir, self.annotations_dir, self.export_dir])

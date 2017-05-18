@@ -17,7 +17,7 @@ def resume_builds():
     def resume_worker():
         for d in get_build_directories(Config.builds_dir):
             log.info("Reattaching build in directory %s", d)
-            build = builds[d] = Build(None, None, init_from_hash=d, resuming=False)
+            build = builds[d] = Build(None, None, init_from_hash=d, resuming=True)
             Build.run(build, 'xml')
     t = Thread(target=resume_worker, args=[])
     t.start()
