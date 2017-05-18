@@ -17,6 +17,7 @@ from enums import Status, Message, finished
 from make_makefile import makefile
 from make_trace import make_trace
 from utils import make_hash, make, mkdir, rmdir, ERROR_MSG
+from subprocess import call
 
 log = logging.getLogger('pipeline.' + __name__)
 
@@ -31,7 +32,7 @@ class Build(object):
     about status changes and incremental messages.
     """
 
-    def __init__(self, text, settings, files=None, init_from_hash=None):
+    def __init__(self, text, settings, files=None, init_from_hash=None, resuming=False):
         """
         Create the necessary directories and the makefile for this
         text and the JSON settings.
@@ -74,17 +75,18 @@ class Build(object):
         self.original_dir = os.path.join(self.directory, 'original')
         self.annotations_dir = os.path.join(self.directory, 'annotations')
         self.export_dir = os.path.join(self.directory, 'export.original')
-        self.warnings_log_file = os.path.join(self.directory, 'warnings.log')
 
         # Files
         self.makefile = os.path.join(self.directory, 'Makefile')
+        self.warnings_log_file = os.path.join(self.directory, 'warnings.log')
+        self.accessed_file = os.path.join(self.directory, 'accessed')
         self.settings_file = os.path.join(self.directory, 'settings.json')
         self.zipfpath = os.path.join(self.directory, "export.zip")
         if not files:
             self.text_file = os.path.join(self.original_dir, self.filename + '.xml')
 
-        # Deem this build as accessed now.
-        self.access()
+        # Deem this build as accessed now, unless resuming an old build
+        self.access(resuming)
 
         # Output from make, line by line
         self.make_out = []
@@ -94,9 +96,16 @@ class Build(object):
         self.steps = 0
         self.step = 0
 
-    def access(self):
-        """Update the access time of this build."""
-        self.accessed_time = time.time()
+    def access(self, resuming):
+        """
+        Update the access time of this build.
+        If resuming=True just get the time stamp of the build.
+        """
+        if resuming:
+            call(['touch', self.accessed_file])
+            self.accessed_time = time.time()
+        else:
+            self.accessed_time = os.path.getmtime(self.accessed_file)
 
     def increment_msg(self):
         """The current increment message"""
