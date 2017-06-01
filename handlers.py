@@ -3,7 +3,6 @@
 from Queue import Queue
 from threading import Thread
 from xml.sax.saxutils import escape, unescape
-from collections import OrderedDict
 from werkzeug.utils import secure_filename
 
 import logging
@@ -19,7 +18,8 @@ from config import Config
 from enums import Status, Message, finished
 from make_makefile import makefile
 from make_trace import make_trace
-from schema_utils import DefaultValidator
+from schema_utils import validate_json
+from schema_generator import make_schema
 from utils import pretty_epoch_time, query, get_build_directories, rmdir, TOOL_DICT, ERROR_MSG
 
 log = logging.getLogger('pipeline.' + __name__)
@@ -58,63 +58,13 @@ def handler_content_type(path):
         return "application/xml; charset=utf-8"
 
 
-def open_json(schema_file):
-    """
-    Open JSON Schema settings.
-    Location of these files is set in config.py.
-    """
-    try:
-        with open(schema_file, "r") as f:
-            schema_str = f.read()
-    except:
-        log.exception("Error reading JSON schema settings file")
-        schema_str = "{}"
-    return schema_str
-
-
-def load_json(schema_file):
-    schema_str = open_json(schema_file)
-    try:
-        settings_schema = json.loads(schema_str)
-    except:
-        log.exception("Error parsing JSON is schema settings")
-        settings_schema = {}
-    return settings_schema
-
-
-def validate_json(schema_file):
-    settings_schema = load_json(schema_file)
-    try:
-        settings_validator = DefaultValidator(settings_schema)
-        return settings_validator
-    except:
-        log.exception("Error starting validator for JSON schema settings")
-
-
 def schema(environ):
     """The /schema handler"""
     qs = cgi.parse_qs(environ['QUERY_STRING'])
     lang = qs.get('language', [''])[0]
+    mode = qs.get('mode', [''])[0]
 
-    if TOOL_DICT.get(lang):
-        analysis = TOOL_DICT.get(lang)
-    else:
-        analysis = "sv"
-    if analysis == "tt":
-        schema_file = Config.tt_schema
-    elif analysis == "fl":  # FreeLing
-        schema_file = Config.fl_schema  # FreeLing
-    elif analysis == "sv-dev":
-        schema_file = Config.sv_dev_schema
-    else:
-        schema_file = Config.sv_schema
-
-    schema_str = open_json(schema_file)
-
-    return_json = json.loads(schema_str, object_pairs_hook=OrderedDict)
-    return_json["properties"]["lang"]["default"] = lang
-    # if lang not in ["sv", "sv-dev", "sv-1800"]:
-    return_json["properties"]["lang"]["enum"] = [lang]
+    return_json = make_schema(lang, mode)
     yield json.dumps(return_json, indent=2)
 
 
@@ -534,19 +484,9 @@ def handle(builds, environ, cmd=None):
     """Remaining handlers: /makefile, /join, / and wrapper for /upload"""
     email = query(environ, 'email', '')
     lang = (query(environ, 'language', ''))
+    mode = (query(environ, 'mode', ''))
 
-    if TOOL_DICT.get(lang):
-        analysis = TOOL_DICT.get(lang)
-    else:
-        analysis = "sv"
-    if analysis == "tt":
-        schema_file = Config.tt_schema
-    elif analysis == "fl":  # FreeLing
-        schema_file = Config.fl_schema  # FreeLing
-    elif analysis == "sv-dev":
-        schema_file = Config.sv_dev_schema
-    else:
-        schema_file = Config.sv_schema
+    schema_json = make_schema(lang, mode)
     error = None
 
     try:
@@ -555,7 +495,7 @@ def handle(builds, environ, cmd=None):
         log.exception("Error in json parsing the settings variable")
         error = escape(make_trace())
         settings = {}
-    settings_validator = validate_json(schema_file)
+    settings_validator = validate_json(schema_json)
     for e in sorted(settings_validator.iter_errors(settings)):
         if error is None:
             error = ""

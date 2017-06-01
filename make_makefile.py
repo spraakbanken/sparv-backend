@@ -152,11 +152,11 @@ def make_paragraph(settings, text, parents, xml_cols, structs, columns):
         else:
             paragraph_segmenter = settings['paragraph_segmentation']
         if settings['paragraph_segmentation'].get('paragraph_chunk'):
-            paragraph_chunk = settings['paragraph_segmentation']['paragraph_chunk']
+            paragraph_chunk = settings['paragraph_segmentation'].get('paragraph_chunk', "root")
             if paragraph_chunk == "root":
                 paragraph_chunk = text
         else:
-            paragraph_chunk = None
+            paragraph_chunk = text
         return add_segmenter(paragraph_segmenter, "paragraph", paragraph_chunk, parents, xml_cols, structs, columns)
     else:
         return add_segmenter("none", "paragraph", None, parents, xml_cols, structs, columns)
@@ -215,7 +215,14 @@ def make_Makefile(settings):
     columns.insert(0, ('word', 'word'))
 
     # The root tag
-    text = settings['root']['tag']
+    if 'root' in settings:
+        text = settings['root'].get('tag', DEFAULT_ROOT)
+    else:
+        settings['root'] = {
+            'tag': DEFAULT_ROOT,
+            'attributes': []
+        }
+        text = DEFAULT_ROOT
 
     # Initial parents. All tags are assumed to have the root node as parent
     parents = []
