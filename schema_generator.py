@@ -95,6 +95,8 @@ corpus = {
 
 
 def lang_prop(lang):
+    # This property will be hidden in the form
+    # because the enum contains only one value
     return {
         "title": "Analysis mode",
         "title_sv": "Analysmode",
@@ -105,6 +107,8 @@ def lang_prop(lang):
 
 
 def textmode_prop(mode):
+    # This property will be hidden in the form
+    # because the enum contains only one value
     return {
         "title": "Text input mode",
         "title_sv": "Textläge",
@@ -189,7 +193,7 @@ def word_segmenter(mode, analysis):
     if mode != "plain":
         segmenter_type = [word_segmenter_tool, word_segmenter_tag]
     else:
-        segmenter_type = word_segmenter_tool
+        segmenter_type = [word_segmenter_tool]
 
     return {
         "title": "Word segmentation",
@@ -232,7 +236,7 @@ def sentence_segmenter_tool(mode):
     if mode != "plain":
         chunk_type = [sentence_chunk, struct_tag_simple]
     else:
-        chunk_type = sentence_chunk
+        chunk_type = [sentence_chunk]
 
     return {
         "title": "Segmenter",
@@ -260,25 +264,6 @@ def sentence_segmenter_tool(mode):
             })
         ])
     }
-
-
-def root(mode):
-    if mode != "plain":
-        return {
-            "title": "Root tag",
-            "title_sv": "Rottagg",
-            "description": "The name of the root tag, with optional attributes",
-            "description_sv": "Root-taggens namn, med valfria attribut",
-            "default": {
-                "tag": "text",
-                "attributes": []
-            },
-            "type": [
-                {"$ref": "#/struct_tag"}
-            ]
-        }
-    else:
-        return None
 
 
 def paragraph_segmentation(mode, analysis):
@@ -349,6 +334,25 @@ def paragraph_segmenter_tool(mode):
     }
 
 
+def root(mode):
+    if mode != "plain":
+        return {
+            "title": "Root tag",
+            "title_sv": "Rottagg",
+            "description": "The name of the root tag, with optional attributes",
+            "description_sv": "Root-taggens namn, med valfria attribut",
+            "default": {
+                "tag": "text",
+                "attributes": []
+            },
+            "type": [
+                {"$ref": "#/struct_tag"}
+            ]
+        }
+    else:
+        return None
+
+
 def extra_tags(mode):
     if mode != "plain":
         return {
@@ -375,6 +379,11 @@ def positional_attributes(lang, analysis):
     elif analysis in ["fl", "tt"]:
         lexical_attrs = ["pos", "msd", "lemma"]
 
+    if lang == "sv-dev":
+        compound_attrs = ["complemgram", "compwf"]
+    else:
+        compound_attrs = ["prefix", "suffix"]
+
     return {
         "title": "Positional attributes",
         "title_sv": "Positionella attribut",
@@ -383,8 +392,8 @@ def positional_attributes(lang, analysis):
         "type": "object",
         "default": {
             "dependency_attributes": ["ref", "dephead", "deprel"],
-            "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense", "saldo"],
-            "compound_attributes": ["complemgram", "compwf", "prefix", "suffix"]
+            "lexical_attributes": lexical_attrs,
+            "compound_attributes": compound_attrs
         },
         "properties": {
             "lexical_attributes": {
@@ -393,7 +402,7 @@ def positional_attributes(lang, analysis):
                 "description": "Attributes for the lexical analysis",
                 "description_sv": "Attribut för lexikalanalysen",
                 "type": "array",
-                "default": ["pos", "msd", "lemma", "lex", "sense", "saldo"],
+                "default": lexical_attrs,
                 "items": {
                     "title": "Attribute",
                     "title_sv": "Attribut",
@@ -408,12 +417,12 @@ def positional_attributes(lang, analysis):
                 "description": "Attributes for the compound analysis",
                 "description_sv": "Attribut för sammansättningsanalysen",
                 "type": "array",
-                "default": ["complemgram", "compwf", "prefix", "suffix"],
+                "default": compound_attrs,
                 "items": {
                     "title": "Attribute",
                     "title_sv": "Attribut",
                     "type": "string",
-                    "enum": ["complemgram", "compwf"] if lang == "sv-dev" else ["prefix", "suffix"],
+                    "enum": compound_attrs
                 }
             } if analysis in ["sv", "sv-dev", "sv-1800"] else None,
 
@@ -501,4 +510,4 @@ def remove_nones(json_input, parent_key=None):
 
 if __name__ == '__main__':
     # For testing purposes
-    print json.dumps(make_schema("sv", "plain"), indent=4, separators=(',', ': '))
+    print json.dumps(make_schema("sv", "plain"), indent=4, separators=(',', ': '), ensure_ascii=False)
