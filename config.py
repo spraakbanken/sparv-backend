@@ -39,12 +39,6 @@ class Config(object):
     # The number of processes (sent as a -j flag to make)
     processes = 2
 
-    # Location of the JSON schema for makefile settings
-    sv_schema = os.path.join(sparv_backend, 'settings_schema_sv.json')
-    sv_dev_schema = os.path.join(sparv_backend, 'settings_schema_sv-dev.json')
-    fl_schema = os.path.join(sparv_backend, 'settings_schema_fl.json')  # FreeLing
-    tt_schema = os.path.join(sparv_backend, 'settings_schema_tt.json')
-
     api_json = os.path.join(sparv_backend, 'api.json')
 
     # Socket file
