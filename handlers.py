@@ -483,8 +483,8 @@ def send_crash_mail(adress, hashnumber, warnings):
 def handle(builds, environ, cmd=None):
     """Remaining handlers: /makefile, /join, / and wrapper for /upload"""
     email = query(environ, 'email', '')
-    lang = (query(environ, 'language', ''))
-    mode = (query(environ, 'mode', ''))
+    lang = (query(environ, 'language', 'sv'))
+    mode = (query(environ, 'mode', 'plain'))
 
     schema_json = make_schema(lang, mode)
     error = None
@@ -535,7 +535,7 @@ def handle(builds, environ, cmd=None):
                 yield "<result>\n"
                 txt = post["text"].value
                 # Escape plain text and give it a root element
-                if settings["textmode"] == "plain":
+                if mode == "plain":
                     txt = escape(txt)
                     txt = "<text>" + txt + "</text>"
                 # Check for empty input

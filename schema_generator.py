@@ -10,11 +10,6 @@ log = logging.getLogger('pipeline.' + __name__)
 
 def make_schema(lang, mode):
     """Build settings schema json."""
-    # Set fallback values
-    if not mode:
-        mode = "plain"
-    if not lang:
-        lang = "sv"
 
     # Get analysis mode from TOOL_DICT
     analysis = TOOL_DICT.get(lang, "sv")
@@ -291,7 +286,7 @@ def paragraph_segmentation(mode, analysis):
         "description": "Paragraph segmenter to use, or a tag supplied with optional structural attributes",
         "description_sv": "Styckessegmenterare som ska användas, eller en tagg med valfria strukturella attribut",
         "default": {"paragraph_segmenter": "blanklines",
-                    "paragraph_chunk": "root"},
+                    "paragraph_chunk": "root"} if mode != "plain" else {"paragraph_segmenter": "blanklines"},
         "type": segmenter_type
     }
 
