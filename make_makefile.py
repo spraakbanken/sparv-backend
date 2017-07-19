@@ -29,7 +29,7 @@ COLUMNS = [('word', 'word'),
 ######################################
 #    Different auxiliary functions   #
 def is_str_str_tuple(t):
-    """Is this object is a tuple of two strings?"""
+    """Is this object a tuple of two strings?"""
     return (isinstance(t, tuple) and len(t) == 2
             and isinstance(t[0], basestring)
             and isinstance(t[1], basestring))

@@ -13,14 +13,14 @@ import smtplib
 import os
 import signal
 
-from build import Build, FILEUPLOAD_EXT
+from build import Build
 from config import Config
 from enums import Status, Message, finished
 from make_makefile import makefile
 from make_trace import make_trace
 from schema_utils import validate_json
 from schema_generator import make_schema
-from utils import pretty_epoch_time, query, get_build_directories, rmdir, TOOL_DICT, ERROR_MSG
+from utils import pretty_epoch_time, query, get_build_directories, rmdir, ERROR_MSG
 
 log = logging.getLogger('pipeline.' + __name__)
 
@@ -194,8 +194,15 @@ def ping():
 def download(builds, environ):
     """The /download handler."""
     hashnumber = query(environ, 'hash', '')
-    zpath = builds[hashnumber].zipfpath
-    filelike = open(zpath, "rb")
+    build = builds[hashnumber]
+
+    # Serve zip file or xml
+    if build.files:
+        filepath = build.zipfpath
+    else:
+        filepath = build.result_file
+
+    filelike = open(filepath, "rb")
     for byte in iter(lambda: filelike.read(4096), ''):
         yield byte
 
@@ -264,7 +271,7 @@ def join_from_hash(builds, hashnumber, incremental):
     """Join a build with a given hash number if it exists."""
     build = builds.get(hashnumber, None)
     if build is not None:
-        if hashnumber.endswith(FILEUPLOAD_EXT):
+        if hashnumber.endswith(Config.fileupload_ext):
             yield ("<settings>%s</settings>\n<original %s/>\n"
                    % (build.get_settings(), escape(build.get_original())))
             for node, _b in join_build_fileupload(build, True):

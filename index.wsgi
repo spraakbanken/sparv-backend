@@ -100,7 +100,11 @@ def application(environ, start_response):
                             ('Access-Control-Allow-Origin', '*'),
                             ("Allow", "POST")]
         if cmd == "/download":
-            response_headers.append(('Content-Disposition', 'attachment; filename="korpus.zip"'))
+            if environ["QUERY_STRING"].endswith(Config.fileupload_ext):
+                response_headers.append(('Content-Disposition', 'attachment; filename="korpus.zip"'))
+            else:
+                response_headers.append(('Content-Disposition', 'attachment; filename="korpus.xml"'))
+
         start_response(status, response_headers)
 
     def unknown():

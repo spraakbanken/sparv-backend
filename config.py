@@ -39,6 +39,9 @@ class Config(object):
     # The number of processes (sent as a -j flag to make)
     processes = 2
 
+    # Extension for file upload hash
+    fileupload_ext = "-f"
+
     api_json = os.path.join(sparv_backend, 'api.json')
 
     # Socket file

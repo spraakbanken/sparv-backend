@@ -21,8 +21,6 @@ from subprocess import call
 
 log = logging.getLogger('pipeline.' + __name__)
 
-FILEUPLOAD_EXT = "-f"
-
 
 class Build(object):
     """
@@ -39,10 +37,11 @@ class Build(object):
         """
         self.status = None
         self.queues = []
+        self.files = files
 
         if init_from_hash:
             self.build_hash = init_from_hash
-            if init_from_hash.endswith(FILEUPLOAD_EXT):
+            if init_from_hash.endswith(Config.fileupload_ext):
                 original_dir = os.path.join(os.path.join(Config.builds_dir, self.build_hash), 'original')
                 filelist = []
                 for root, dirs, files in os.walk(original_dir):
@@ -62,8 +61,7 @@ class Build(object):
             # for file upload
             if files:
                 self.text = "\n".join(text for _fn, text in files)
-                self.files = files
-                self.build_hash = make_hash(self.text, self.makefile_contents) + FILEUPLOAD_EXT
+                self.build_hash = make_hash(self.text, self.makefile_contents) + Config.fileupload_ext
             else:
                 self.text = text
                 self.filename = 'text'
@@ -84,6 +82,7 @@ class Build(object):
         self.zipfpath = os.path.join(self.directory, "export.zip")
         if not files:
             self.text_file = os.path.join(self.original_dir, self.filename + '.xml')
+            self.result_file = os.path.join(self.export_dir, self.filename + '.xml')
 
         # Deem this build as accessed now, unless resuming an old build
         self.access(resuming)
@@ -150,7 +149,7 @@ class Build(object):
 
     def get_original(self):
         # for file upload
-        if hasattr(self, 'files'):
+        if self.files:
             original = []
             for filename, _text in self.files:
                 original.append(filename + ".xml")
@@ -186,7 +185,7 @@ class Build(object):
             f.write(json.dumps(self.settings, indent=2))
 
         # for file upload
-        if hasattr(self, 'files'):
+        if self.files:
             for filename, text in self.files:
                 infile = os.path.join(self.original_dir, filename + ".xml")
                 with open(infile, 'w') as f:
@@ -232,7 +231,7 @@ class Build(object):
         make_init = ['@TEXT'] + make_settings
 
         # For file upload
-        if hasattr(self, 'files'):
+        if self.files:
             make_settings = ['export'] + make_settings
             self.out_files = []
             self.textfiles = []
@@ -381,6 +380,8 @@ class Build(object):
 
         # Result when Done
         elif self.status == Status.Done:
+            download_link = "%s/download?hash=%s" % (Config.backend, self.build_hash)
+
             if self.warnings:
                 out.append('<warning>' + escape(self.warnings) + '</warning>')
 
@@ -392,8 +393,7 @@ class Build(object):
                         log.exception(ERROR_MSG["missing_file"])
                         return "\n".join(out)
 
-                link = "%s/download?hash=%s" % (Config.backend, self.build_hash)
-                result = "<corpus link='%s'/>\n" % link
+                result = "<corpus link='%s'/>\n" % download_link
                 return result
 
             else:
@@ -416,6 +416,7 @@ class Build(object):
                         if not result_contents.strip("<corpus>\n").rstrip("</corpus>\n\n"):
                             raise ValueError('empty result file')
                         else:
+                            result_contents = result_contents.replace("<corpus", "<corpus link='%s'" % download_link)
                             out.append(result_contents)
                             return "\n".join(out)
                 except:
