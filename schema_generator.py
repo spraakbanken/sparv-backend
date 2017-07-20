@@ -13,6 +13,7 @@ def make_schema(lang, mode):
 
     # Get analysis mode from TOOL_DICT
     analysis = TOOL_DICT.get(lang, "sv")
+    print analysis
 
     schema = {
         "struct_tag": struct_tag,
@@ -366,18 +367,18 @@ def extra_tags(mode):
 
 
 def positional_attributes(lang, analysis):
-    if analysis in ["fl", "tt"]:
-        lexical_attrs = ["pos", "msd", "lemma"]
-    else:
-        if lang == "sv-dev":
-            lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
-        else:
-            lexical_attrs = ["pos", "msd", "lemma", "lex", "saldo"]
-
     if lang == "sv-dev":
+        lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
         compound_attrs = ["complemgram", "compwf"]
-    else:
+        dependency_attributes = ["ref", "dephead", "deprel"]
+    elif analysis in ["sv", "sv-1800"]:
+        lexical_attrs = ["pos", "msd", "lemma", "lex", "saldo"]
         compound_attrs = ["prefix", "suffix"]
+        dependency_attributes = ["ref", "dephead", "deprel"]
+    else:  # analysis in ["fl", "tt"]
+        lexical_attrs = ["pos", "msd", "lemma"]
+        compound_attrs = None
+        dependency_attributes = None
 
     return {
         "title": "Positional attributes",
@@ -386,7 +387,7 @@ def positional_attributes(lang, analysis):
         "description_sv": "Positionella attribut som ska genereras i analysen. Attribut som har valts under 'ordtagg' får inte förekomma här.",
         "type": "object",
         "default": {
-            "dependency_attributes": ["ref", "dephead", "deprel"],
+            "dependency_attributes": dependency_attributes,
             "lexical_attributes": lexical_attrs,
             "compound_attributes": compound_attrs
         },
@@ -434,7 +435,7 @@ def positional_attributes(lang, analysis):
                     "type": "string",
                     "enum": ["ref", "dephead", "deprel"]
                 }
-            } if analysis == "sv" else None
+            } if analysis in ["sv", "sv-dev", "sv-1800"] else None
         }
     }
 
