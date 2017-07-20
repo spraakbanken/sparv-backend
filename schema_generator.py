@@ -366,13 +366,13 @@ def extra_tags(mode):
 
 
 def positional_attributes(lang, analysis):
-    if analysis == "sv":
+    if analysis in ["fl", "tt"]:
+        lexical_attrs = ["pos", "msd", "lemma"]
+    else:
         if lang == "sv-dev":
             lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
         else:
             lexical_attrs = ["pos", "msd", "lemma", "lex", "saldo"]
-    elif analysis in ["fl", "tt"]:
-        lexical_attrs = ["pos", "msd", "lemma"]
 
     if lang == "sv-dev":
         compound_attrs = ["complemgram", "compwf"]
