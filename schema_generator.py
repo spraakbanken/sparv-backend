@@ -13,7 +13,6 @@ def make_schema(lang, mode):
 
     # Get analysis mode from TOOL_DICT
     analysis = TOOL_DICT.get(lang, "sv")
-    print analysis
 
     schema = {
         "struct_tag": struct_tag,
