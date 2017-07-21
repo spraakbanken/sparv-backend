@@ -12,6 +12,7 @@ import cgi
 import smtplib
 import os
 import signal
+import sys
 
 from build import Build
 from config import Config
@@ -262,7 +263,7 @@ def build(builds, original_text, settings, incremental, fmt, files=None):
                  (build.build_hash, pretty_epoch_time(build.status_change_time)))
 
     if files:
-        return join_build_fileupload(build, incremental)
+        return join_build(build, incremental, fileupload=True)
     else:
         return join_build(build, incremental)
 
@@ -274,7 +275,7 @@ def join_from_hash(builds, hashnumber, incremental):
         if hashnumber.endswith(Config.fileupload_ext):
             yield ("<settings>%s</settings>\n<original %s/>\n"
                    % (build.get_settings(), escape(build.get_original())))
-            for node, _b in join_build_fileupload(build, True):
+            for node, _b in join_build(build, True, fileupload=True):
                 yield node
         else:
             yield ("<settings>%s</settings>\n<original>%s</original>\n"
@@ -285,55 +286,11 @@ def join_from_hash(builds, hashnumber, incremental):
         yield "<error>No such build!</error>\n</result>\n"
 
 
-def join_build_fileupload(build, incremental):
-    """
-    Join an existing fileupload build and send increment messages
-    until it is completed. Then send the link to the downloadable zip file.
-    """
-    # Make a new queue which receives messages from the builder process
-    queue = Queue()
-    build.queues.append(queue)
-
-    def get_result():
-        assert(finished(build.status))
-        build.access()
-        return build.result() + '</result>\n'
-
-    # Send this build's hash
-    yield "<build hash='%s' type='files'/>\n" % build.build_hash, build
-
-    # Result already exists
-    if finished(build.status):
-        log.info("Result already exists since %s" %
-                 pretty_epoch_time(build.status_change_time))
-        yield get_result(), build
-
-    # Listen for completion
-    else:
-        if incremental and build.status == Status.Running:
-            log.info("Already running, sending increment message")
-            yield build.increment_msg(), build
-
-        while True:
-            msg_type, msg = queue.get()
-            if msg_type == Message.StatusChange:
-                log.info("Message %s" % Status.lookup[msg])
-            # Has status changed to finished?
-            if msg_type == Message.StatusChange:
-                if finished(msg):
-                    break
-            # Increment message
-            elif incremental and msg_type == Message.Increment:
-                yield msg, build
-
-        log.info("Getting result...")
-        yield get_result(), build
-
-
-def join_build(build, incremental):
+def join_build(build, incremental, fileupload=False):
     """
     Join an existing build, and send increment messages
-    until it is completed, then send the build's result.
+    until it is completed. Then send the build's result or
+    the link to the downloadable zip file.
     """
     # Make a new queue which receives messages from the builder process
     queue = Queue()
@@ -342,22 +299,36 @@ def join_build(build, incremental):
     def get_result():
         assert(finished(build.status))
         build.access()
-        return build.result() + '</result>\n'
+        try:
+            return build.result() + '</result>\n'
+        except:
+            error = sys.exc_info()[0]
+            log.error("Error while getting result: " + error)
+            return "<result>\n<error>%s\n\n%s</error>\n</result>\n" % (ERROR_MSG["no_result"], error)
 
     # Send this build's hash
-    yield "<build hash='%s'/>\n" % build.build_hash
+    if fileupload:
+        yield "<build hash='%s' type='files'/>\n" % build.build_hash, build
+    else:
+        yield "<build hash='%s'/>\n" % build.build_hash
 
     # Result already exists
     if finished(build.status):
         log.info("Result already exists since %s" %
                  pretty_epoch_time(build.status_change_time))
-        yield get_result()
+        if fileupload:
+            yield get_result(), build
+        else:
+            yield get_result()
 
     # Listen for completion
     else:
         if incremental and build.status == Status.Running:
             log.info("Already running, sending increment message")
-            yield build.increment_msg()
+            if fileupload:
+                yield build.increment_msg(), build
+            else:
+                yield build.increment_msg()
 
         while True:
             msg_type, msg = queue.get()
@@ -369,10 +340,16 @@ def join_build(build, incremental):
                     break
             # Increment message
             elif incremental and msg_type == Message.Increment:
-                yield msg
+                if fileupload:
+                    yield msg, build
+                else:
+                    yield msg
 
         log.info("Getting result...")
-        yield get_result()
+        if fileupload:
+            yield get_result(), build
+        else:
+            yield get_result()
 
 
 def get_files(infiles):
