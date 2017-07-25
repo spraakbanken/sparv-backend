@@ -301,9 +301,8 @@ def join_build(build, incremental, fileupload=False):
         build.access()
         try:
             return build.result() + '</result>\n'
-        except:
-            error = sys.exc_info()[0]
-            log.error("Error while getting result: %s" % error)
+        except Exception, error:
+            log.error("Error while getting result: %s" % str(error))
             return "<error>%s\n</error>\n</result>\n" % ERROR_MSG["no_result"]
 
     # Send this build's hash
