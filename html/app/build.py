@@ -2,21 +2,22 @@
 # The Build class that contains the information about an initalised, running,
 # or finished build.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str, object
 from xml.sax.saxutils import escape
 
 import time
 import os
 import logging
 import zipfile
-import StringIO
+import io
 import re
-import xml.sax.saxutils
 
 from config import Config
 from enums import Status, Message, finished
 from make_makefile import makefile
-from make_trace import make_trace
-from utils import make_hash, make, mkdir, rmdir, ERROR_MSG
+from utils import make_hash, make, mkdir, rmdir, ERROR_MSG, make_trace, UTF8
 from subprocess import call
 
 log = logging.getLogger('pipeline.' + __name__)
@@ -115,7 +116,8 @@ class Build(object):
 
     def send_to_all(self, msg):
         """Send a message to all listeners."""
-        map(lambda q: q.put(msg), self.queues)
+        for q in self.queues:
+            q.put(msg)
 
     def change_status(self, status):
         """Change the status and notify all listeners."""
@@ -173,7 +175,9 @@ class Build(object):
         self.access()
 
         # Make directories
-        map(mkdir, [self.directory, self.original_dir, self.annotations_dir, self.export_dir])
+        # map(mkdir, [self.directory, self.original_dir, self.annotations_dir, self.export_dir])
+        for i in [self.directory, self.original_dir, self.annotations_dir, self.export_dir]:
+            mkdir(i)
 
         # Make makefile
         with open(self.makefile, 'w') as f:
@@ -255,6 +259,12 @@ class Build(object):
             self.textfile = os.path.join(self.annotations_dir, self.filename + '.@TEXT')
             stdout, stderr = make(make_init).communicate("")
             self.change_status(Status.Parsing)
+            if stderr:
+                send_warnings()
+                self.change_status(Status.Error)
+                self.stderr = stderr.rstrip().decode("UTF-8")
+                log.exception(ERROR_MSG["make_error"])
+                return
             # Send warnings
             if not os.path.exists(self.textfile):
                 send_warnings()
@@ -271,7 +281,7 @@ class Build(object):
 
         # Do a dry run to get the number of invocations that will be made
         stdout, stderr = make(make_settings + ['--dry-run']).communicate("")
-        steps = stdout.count(Config.python_interpreter)
+        steps = stdout.decode(UTF8).count(Config.python_interpreter)
 
         # No remote installations allowed
         os.environ['remote_cwb_datadir'] = "null"
@@ -285,7 +295,8 @@ class Build(object):
         # Process the output from make
         self.change_step(new_cmd="", new_step=0, new_steps=steps + 1)
         step = 0
-        for line in iter(self.make_process.stdout.readline, ''):
+        for line in iter(self.make_process.stdout.readline, b''):
+            line = line.decode(UTF8)
             self.make_out.append(line)
             if Config.python_interpreter in line:
                 step += 1
@@ -316,7 +327,7 @@ class Build(object):
             self._run(fmt)
         except:
             self.trace = make_trace()
-            log.exception("Error when running make")
+            log.exception(ERROR_MSG["make_error"])
             self.stdout = "".join(self.make_out)
             if self.make_process:
                 self.stderr = self.make_process.stderr.read().rstrip()
@@ -332,8 +343,8 @@ class Build(object):
             l = re.sub(r"^\d+\W\|\W", "", line)
             # Only include lines with warnings and errors
             if "warning :" in l or "-ERROR-" in l:
-                if xml.sax.saxutils.escape(l) not in lines:
-                    lines.append(xml.sax.saxutils.escape(l))
+                if escape(l) not in lines:
+                    lines.append(escape(l))
         return "\n".join(lines)
 
     def zip_result(self):
@@ -342,7 +353,7 @@ class Build(object):
         if self.status == Status.Done:
             if os.listdir(self.export_dir):
                 zipf = zipfile.ZipFile(self.zipfpath, 'w', compression=zipfile.ZIP_DEFLATED)
-                filelike = StringIO.StringIO()
+                filelike = io.StringIO()
                 with zipfile.ZipFile(filelike, 'w', compression=zipfile.ZIP_DEFLATED) as zipflike:
                     for root, _dirs, files in os.walk(self.export_dir):
                             for xmlfile in files:

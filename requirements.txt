@@ -1,5 +1,0 @@
-enum-compat==0.0.2
-enum34==1.1.6
-eventlet==0.20.1
-greenlet==0.4.12
-Werkzeug==0.12.1

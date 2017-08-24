@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from utils import TOOL_DICT
 from collections import OrderedDict
 import json
@@ -489,7 +490,7 @@ text_attributes = {
 def remove_nones(json_input, parent_key=None):
     """Recursively remove all keys which have value None."""
     if isinstance(json_input, dict):
-        for k, v in json_input.items():
+        for k, v in list(json_input.items()):
             if v is None:
                 json_input.pop(k)
             else:
@@ -505,4 +506,4 @@ def remove_nones(json_input, parent_key=None):
 
 if __name__ == '__main__':
     # For testing purposes
-    print json.dumps(make_schema("sv", "plain"), indent=4, separators=(',', ': '), ensure_ascii=False)
+    print(json.dumps(make_schema("sv", "plain"), indent=4, separators=(',', ': '), ensure_ascii=False))

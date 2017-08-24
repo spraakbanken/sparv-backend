@@ -1,0 +1,238 @@
+<style>
+    body {
+      margin-top: 2em;
+      margin-left: 2em;
+      font-family: Consolas, monaco, monospace;
+      }
+    p {
+      color: RoyalBlue;
+      font-family: Verdana, Helvetica, sans-serif;
+      }
+    h1, h2, h3 {
+      font-family: Verdana, Helvetica, sans-serif;
+    }
+    body > ul > li {
+        margin-bottom: 2em;
+        color: RoyalBlue;
+        list-style-type: disc;
+    }
+    body > ul > li > ul {
+        color: black;
+    }
+    ul {
+        list-style-type: circle;
+    }
+</style>
+<h1 id="sparv-api">Sparv API</h1>
+<p>Read Sparv's API documentation: <a href="https://spraakbanken.gu.se/eng/research/infrastructure/sparv/webservice" class="uri">https://spraakbanken.gu.se/eng/research/infrastructure/sparv/webservice</a></p>
+<h2 id="available-queries">Available queries</h2>
+<ul>
+<li>/api
+<ul>
+<li>description: Shows this short API description.</li>
+<li>methods: GET</li>
+</ul></li>
+<li>/
+<ul>
+<li>description: Handles text input and runs the analysis.</li>
+<li>methods: GET, POST</li>
+<li>params:
+<ul>
+<li>language, default: sv</li>
+<li>mode, default: plain</li>
+<li>text, default: ''</li>
+<li>settings</li>
+<li>incremental, default: False</li>
+</ul></li>
+</ul></li>
+<li>/status
+<ul>
+<li>description: Returns the status of existing builds.</li>
+<li>methods: GET</li>
+</ul></li>
+<li>/ping
+<ul>
+<li>description: Pings the backend, responds with the status of the catapult.</li>
+<li>methods: GET</li>
+</ul></li>
+<li>/schema
+<ul>
+<li>description: Returns the json schema generated from the parameters provided.</li>
+<li>methods: GET</li>
+<li>params:
+<ul>
+<li>language, default: sv</li>
+<li>mode, default: plain</li>
+</ul></li>
+</ul></li>
+<li>/makefile
+<ul>
+<li>description: Returns the Makefile generated from the parameters provided.</li>
+<li>methods: GET, POST</li>
+<li>params:
+<ul>
+<li>language, default: sv</li>
+<li>mode, default: plain</li>
+<li>settings</li>
+<li>incremental, default: False</li>
+</ul></li>
+</ul></li>
+<li>/upload
+<ul>
+<li>description: Handles upload of files and runs the analysis.</li>
+<li>methods: GET, POST</li>
+<li>params:
+<ul>
+<li>language, default: sv</li>
+<li>mode, default: plain</li>
+<li>email, default: ''</li>
+<li>files</li>
+<li>settings</li>
+</ul></li>
+</ul></li>
+<li>/download
+<ul>
+<li>description:</li>
+<li>methods: GET</li>
+<li>params:
+<ul>
+<li>hash, default: ''</li>
+</ul></li>
+</ul></li>
+<li>/join
+<ul>
+<li>description: Joins an existing build.</li>
+<li>methods: GET, POST</li>
+<li>params:
+<ul>
+<li>language, default: sv</li>
+<li>mode, default: plain</li>
+<li>hashnumber, default: ''</li>
+<li>incremental, default: False</li>
+</ul></li>
+</ul></li>
+<li>/cleanup
+<ul>
+<li>description: Removes builds that are finished and haven't been accessed within the timeout (7 days). Requires secret_key parameter in query.</li>
+<li>methods: GET</li>
+<li>params:
+<ul>
+<li>secret_key, default: ''</li>
+</ul></li>
+</ul></li>
+<li>/cleanup/errors
+<ul>
+<li>description: Removes builds that are finished and haven't been accessed within the timeout (7 days) and the builds with status Error. Requires secret_key parameter in query.</li>
+<li>methods: GET</li>
+<li>params:
+<ul>
+<li>secret_key, default: ''</li>
+</ul></li>
+</ul></li>
+<li>/cleanup/forceall
+<ul>
+<li>description: Removes all the existing builds. Requires secret_key parameter in query.</li>
+<li>methods: GET</li>
+<li>params:
+<ul>
+<li>secret_key, default: ''</li>
+</ul></li>
+</ul></li>
+</ul>
+<h2 id="example-settings">Example settings</h2>
+<p>Swedish plain text input (default mode):</p>
+<pre><code>settings={
+    &quot;corpus&quot;:&quot;untitled&quot;,
+    &quot;lang&quot;:&quot;sv&quot;,
+    &quot;textmode&quot;:&quot;plain&quot;,
+    &quot;word_segmenter&quot;:&quot;default_tokenizer&quot;,
+    &quot;sentence_segmentation&quot;:{
+        &quot;sentence_segmenter&quot;:&quot;default_tokenizer&quot;,
+        &quot;sentence_chunk&quot;:&quot;paragraph&quot;
+        },
+    &quot;paragraph_segmentation&quot;:{
+        &quot;paragraph_segmenter&quot;:&quot;blanklines&quot;,
+        &quot;paragraph_chunk&quot;:&quot;root&quot;
+        },
+    &quot;root&quot;:{
+        &quot;tag&quot;:&quot;text&quot;,
+        &quot;attributes&quot;:[]
+        },
+    &quot;extra_tags&quot;:[],
+    &quot;positional_attributes&quot;:{
+        &quot;dependency_attributes&quot;:[&quot;ref&quot;,&quot;dephead&quot;,&quot;deprel&quot;],
+        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;,&quot;lex&quot;,&quot;saldo&quot;],
+        &quot;compound_attributes&quot;:[&quot;prefix&quot;,&quot;suffix&quot;]
+        }
+    }</code></pre>
+<p>Swedish with xml input:</p>
+<pre><code>settings={
+    &quot;corpus&quot;:&quot;exempelkorpus&quot;,
+    &quot;lang&quot;:&quot;sv&quot;,
+    &quot;textmode&quot;:&quot;xml&quot;,
+    &quot;word_segmenter&quot;:&quot;default_tokenizer&quot;,
+    &quot;sentence_segmentation&quot;:{
+        &quot;tag&quot;:&quot;s&quot;,
+        &quot;attributes&quot;:[&quot;number&quot;]
+        },
+    &quot;paragraph_segmentation&quot;:{
+        &quot;tag&quot;:&quot;p&quot;,
+        &quot;attributes&quot;:[&quot;name&quot;]
+        },
+    &quot;root&quot;:{
+        &quot;tag&quot;:&quot;text&quot;,
+        &quot;attributes&quot;:[&quot;title&quot;]
+        },
+    &quot;extra_tags&quot;:[
+        {
+            &quot;tag&quot;:&quot;chapter&quot;,
+            &quot;attributes&quot;:[&quot;name&quot;]
+            }
+        ],
+    &quot;positional_attributes&quot;:{
+        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;,&quot;lex&quot;,&quot;saldo&quot;],
+        &quot;compound_attributes&quot;:[&quot;prefix&quot;,&quot;suffix&quot;],
+        &quot;dependency_attributes&quot;:[&quot;ref&quot;,&quot;dephead&quot;,&quot;deprel&quot;]
+        }
+    }</code></pre>
+<p>English:</p>
+<pre><code>settings={
+    &quot;corpus&quot;:&quot;untitled&quot;,
+    &quot;lang&quot;:&quot;en&quot;,
+    &quot;textmode&quot;:&quot;plain&quot;,
+    &quot;positional_attributes&quot;:{
+        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;]
+        },
+    &quot;text_attributes&quot;:{
+        &quot;readibility_metrics&quot;:[&quot;lix&quot;,&quot;ovix&quot;,&quot;nk&quot;]
+        }
+    }</code></pre>
+<p>Swedish development mode (Sparv labs):</p>
+<pre><code>settings={
+    &quot;corpus&quot;:&quot;untitled&quot;,
+    &quot;lang&quot;:&quot;sv-dev&quot;,
+    &quot;textmode&quot;:&quot;plain&quot;,
+    &quot;word_segmenter&quot;:&quot;default_tokenizer&quot;,
+    &quot;sentence_segmentation&quot;:{
+        &quot;sentence_segmenter&quot;:&quot;default_tokenizer&quot;,
+        &quot;sentence_chunk&quot;:&quot;paragraph&quot;
+        },
+    &quot;paragraph_segmentation&quot;:{
+        &quot;paragraph_segmenter&quot;:&quot;blanklines&quot;,
+        &quot;paragraph_chunk&quot;:&quot;root&quot;
+        },
+    &quot;root&quot;:{
+        &quot;tag&quot;:&quot;text&quot;,
+        &quot;attributes&quot;:[]
+        },
+    &quot;extra_tags&quot;:[],
+    &quot;positional_attributes&quot;:{
+        &quot;dependency_attributes&quot;:[&quot;ref&quot;,&quot;dephead&quot;,&quot;deprel&quot;],
+        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;,&quot;lex&quot;,&quot;sense&quot;],
+        &quot;compound_attributes&quot;:[&quot;complemgram&quot;,&quot;compwf&quot;]
+        },
+    &quot;named_entity_recognition&quot;:[&quot;ex&quot;,&quot;type&quot;,&quot;subtype&quot;],
+    &quot;text_attributes&quot;:{
+        &quot;readibility_metrics&quot;:[&quot;lix&quot;,&quot;ovix&quot;,&quot;nk&quot;]
+        }
+    }</code></pre>

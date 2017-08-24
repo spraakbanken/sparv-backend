@@ -9,7 +9,7 @@ class DefaultValidator(Draft3Validator):
     """This validator populates missing values with the default values in a schema."""
     def validate_properties(self, properties, instance, schema):
         super(DefaultValidator, self).validate_properties(properties, instance, schema)
-        for k, v in properties.iteritems():
+        for k, v in properties.items():
             if k not in instance and "default" in v:
                 default = v["default"]
                 super(DefaultValidator, self).validate(default, v)

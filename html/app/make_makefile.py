@@ -1,5 +1,7 @@
 # Makes a makefile from a JSON object that validates the schema
 
+from builtins import str, map, zip, range
+from past.builtins import basestring
 import re
 import json
 from utils import TOOL_DICT
@@ -50,19 +52,19 @@ def linearise_Makefile(content):
 
 
 def align_table(rows, empty="-"):
-    max_row_len = max(map(len, rows) + [0])
+    max_row_len = max(list(map(len, rows)) + [0])
     rows = [row + [empty] * (max_row_len - len(row)) for row in rows]
-    cols = zip(*rows)
-    col_widths = [max(map(len, col)) for col in cols]
+    cols = list(zip(*rows))
+    col_widths = [max(list(map(len, col))) for col in cols]
     fmt = ' '.join('{%s:<%s}' % (ix, width)
                    for ix, width
-                   in zip(xrange(len(cols)), col_widths))
+                   in zip(range(len(cols)), col_widths))
     return [fmt.format(*row) for row in rows]
 
 
 def makefile_comment(s):
     """Makes a string to a valid makefile comment"""
-    return "\n".join(map(lambda l: "# " + l, s.split("\n")))
+    return "\n".join(["# " + l for l in s.split("\n")])
 
 
 def add_parent(tag, parents):
@@ -305,11 +307,11 @@ def make_Makefile(settings):
         rows.extend([("analysis", analysis)])
 
     rows.extend(["",
-                 zip(["vrt_columns_annotations", "vrt_columns"], map(list, zip(*columns))),
+                 list(zip(["vrt_columns_annotations", "vrt_columns"], list(map(list, list(zip(*columns)))))),
                  "",
-                 zip(["vrt_structs_annotations", "vrt_structs"], map(list, zip(*structs))),
+                 list(zip(["vrt_structs_annotations", "vrt_structs"], list(map(list, list(zip(*structs)))))),
                  "",
-                 zip(["xml_elements", "xml_annotations"], map(list, zip(*xml_cols))),
+                 list(zip(["xml_elements", "xml_annotations"], list(map(list, list(zip(*xml_cols)))))),
                  ""])
 
     # Avoid missing parents warning for named entity recognition
@@ -321,7 +323,7 @@ def make_Makefile(settings):
         rows.extend(sentence + [""])
         rows.extend(paragraph + [""])
 
-    custom_rule_names = map(lambda t: t[0], custom_rules)
+    custom_rule_names = [t[0] for t in custom_rules]
     if len(custom_rule_names) > 0:
         for custom in custom_rules:
             rows += [makefile_comment("Custom rule for " + custom[0] + ":"), custom[1], ""]
@@ -352,8 +354,7 @@ if __name__ == '__main__':
         def stringifyKeys(s):
             return re.sub(r'(\w+):', r'"\1":', s)
 
-        return '\n'.join(filter(lambda l: "//" not in l,
-                                map(stringifyKeys, s.split('\n'))))
+        return '\n'.join([l for l in map(stringifyKeys, s.split('\n')) if "//" not in l])
 
     def json_to_Makefile(filename):
         """Make a makefile from a javascript json description in filename"""

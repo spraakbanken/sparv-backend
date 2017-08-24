@@ -1,12 +1,14 @@
 # Enums used in the pipeline
 
+from builtins import zip, range
+
 
 def enum(*sequential):
     """
     Makes an enumerator type: http://stackoverflow.com/a/1695250/165544
     """
-    enums = dict(zip(sequential, range(len(sequential))))
-    enums['lookup'] = dict((value, key) for key, value in enums.iteritems())
+    enums = dict(list(zip(sequential, list(range(len(sequential))))))
+    enums['lookup'] = dict((value, key) for key, value in enums.items())
     return type('Enum', (), enums)
 
 # The possible statuses of a pipeline

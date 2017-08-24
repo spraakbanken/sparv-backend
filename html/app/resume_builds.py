@@ -14,6 +14,7 @@ log = logging.getLogger('pipeline.' + __name__)
 
 def resume_builds():
     builds = {}
+
     def resume_worker():
         for d in get_build_directories(Config.builds_dir):
             log.info("Reattaching build in directory %s", d)

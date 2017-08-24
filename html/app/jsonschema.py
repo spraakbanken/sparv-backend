@@ -10,6 +10,10 @@ instance under a schema, and will create a validator for you.
 
 from __future__ import division, unicode_literals
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next, zip, map, object
+from past.builtins import basestring
 import collections
 import json
 import itertools
@@ -24,15 +28,15 @@ FLOAT_TOLERANCE = 10 ** -15
 PY3 = sys.version_info[0] >= 3
 
 if PY3:
-    basestring = unicode = str
+    basestring = str = str
     iteritems = operator.methodcaller("items")
     from urllib.parse import unquote
     from urllib.request import urlopen
 else:
-    from itertools import izip as zip
+
     iteritems = operator.methodcaller("iteritems")
-    from urllib import unquote
-    from urllib2 import urlopen
+    from urllib.parse import unquote
+    from urllib.request import urlopen
 
 
 class UnknownType(Exception):
@@ -492,7 +496,7 @@ class RefResolver(object):
             return schema
 
         parts = ref.lstrip("#/").split("/")
-        parts = map(unquote, parts)
+        parts = list(map(unquote, parts))
         parts = [part.replace('~1', '/').replace('~0', '~') for part in parts]
 
         try:
