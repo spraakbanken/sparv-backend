@@ -1,8 +1,15 @@
-Options +ExecCGI
-AddHandler wsgi-script .wsgi
+DirectoryIndex disabled
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(.*)$ http://localhost:58444/$1 [P]
+Header edit* Location "http://localhost:58444/" "http://demo.spraakdata.gu.se/anne/sparv/backend/"
 
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^(.*)$ index.wsgi/$1 [QSA,PT,L]                
-</IfModule>
+
+#Options +ExecCGI
+#AddHandler wsgi-script .wsgi
+
+#<IfModule mod_rewrite.c>
+#  RewriteEngine On
+#  RewriteCond %{REQUEST_FILENAME} !-f
+#  RewriteRule ^(.*)$ index.wsgi/$1 [QSA,PT,L]
+#</IfModule>
