@@ -15,14 +15,14 @@ def make_schema(lang, mode):
     # Get analysis mode from TOOL_DICT
     analysis = TOOL_DICT.get(lang, "sv")
 
-    schema = {
-        "struct_tag": struct_tag,
-        "struct_tag_simple": struct_tag_simple,
-        "title": "Corpus pipeline makefile settings",
-        "title_sv": "Makefilsinställningar till korpusimportkedjan",
-        "documentation": "Settings that generate the Makefile for the corpus pipeline",
-        "type": "object",
-        "properties": OrderedDict([
+    schema = OrderedDict([
+        ("struct_tag", struct_tag),
+        ("struct_tag_simple", struct_tag_simple),
+        ("title", "Corpus pipeline makefile settings"),
+        ("title_sv", "Makefilsinställningar till korpusimportkedjan"),
+        ("documentation", "Settings that generate the Makefile for the corpus pipeline"),
+        ("type", "object"),
+        ("properties", OrderedDict([
             ("corpus", corpus),
             ("lang", lang_prop(lang)),
             ("textmode", textmode_prop(mode)),
@@ -34,11 +34,13 @@ def make_schema(lang, mode):
             ("positional_attributes", positional_attributes(lang, analysis)),
             ("named_entity_recognition", named_entity_recognition(lang)),
             ("text_attributes", text_attributes)
-        ])
-    }
+        ]))
+    ])
     # Remove entries with None values
     [i for i in remove_nones(schema)]
 
+    # Add list with object order to all OrderedDicts
+    [i for i in add_order(schema)]
     return schema
 
 
@@ -386,13 +388,13 @@ def positional_attributes(lang, analysis):
         "description": "Positional attributes to generate in the analysis. Attributes already present in the word tag must not appear here again.",
         "description_sv": "Positionella attribut som ska genereras i analysen. Attribut som har valts under 'ordtagg' får inte förekomma här.",
         "type": "object",
-        "default": {
-            "dependency_attributes": dependency_attributes,
-            "lexical_attributes": lexical_attrs,
-            "compound_attributes": compound_attrs
-        },
-        "properties": {
-            "lexical_attributes": {
+        "default": OrderedDict([
+            ("lexical_attributes", lexical_attrs),
+            ("compound_attributes", compound_attrs),
+            ("dependency_attributes", dependency_attributes)
+        ]),
+        "properties": OrderedDict([
+            ("lexical_attributes", {
                 "title": "Lexical analysis",
                 "title_sv": "Lexikalanalys",
                 "description": "Attributes for the lexical analysis",
@@ -405,9 +407,9 @@ def positional_attributes(lang, analysis):
                     "type": "string",
                     "enum": lexical_attrs
                 }
-            },
+            }),
 
-            "compound_attributes": {
+            ("compound_attributes", {
                 "title": "Compound analysis",
                 "title_sv": "Sammansättningsanalys",
                 "description": "Attributes for the compound analysis",
@@ -420,9 +422,9 @@ def positional_attributes(lang, analysis):
                     "type": "string",
                     "enum": compound_attrs
                 }
-            } if analysis in ["sv", "sv-dev", "sv-1800"] else None,
+            } if analysis in ["sv", "sv-dev", "sv-1800"] else None),
 
-            "dependency_attributes": {
+            ("dependency_attributes", {
                 "title": "Dependency analysis",
                 "title_sv": "Dependensanalys",
                 "description": "Attributes for the dependency analysis",
@@ -435,8 +437,8 @@ def positional_attributes(lang, analysis):
                     "type": "string",
                     "enum": ["ref", "dephead", "deprel"]
                 }
-            } if analysis in ["sv", "sv-dev", "sv-1800"] else None
-        }
+            } if analysis in ["sv", "sv-dev", "sv-1800"] else None)
+        ]),
     }
 
 
@@ -504,6 +506,21 @@ def remove_nones(json_input, parent_key=None):
                 yield item_val
 
 
+def add_order(json_input):
+    if isinstance(json_input, OrderedDict):
+        json_input["order"] = []
+        for k, v in json_input.items():
+            if k != "order":
+                json_input["order"].append(k)
+            for child_val in add_order(v):
+                yield child_val
+    elif isinstance(json_input, dict):
+        for k, v in json_input.items():
+            for child_val in add_order(v):
+                yield child_val
+
+
 if __name__ == '__main__':
     # For testing purposes
-    print(json.dumps(make_schema("sv", "plain"), indent=4, separators=(',', ': '), ensure_ascii=False))
+    schema = make_schema("sv", "plain")
+    print(json.dumps(schema, indent=4, separators=(',', ': '), ensure_ascii=False))
