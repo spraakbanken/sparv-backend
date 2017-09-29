@@ -2,7 +2,7 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from flask import Flask, Response, request, json, render_template
+from flask import Flask, Response, request, json, render_template, send_from_directory
 from flask_cors import CORS
 from xml.sax.saxutils import escape
 import logging
@@ -12,7 +12,7 @@ import os
 from config import Config
 from make_makefile import makefile
 from schema_generator import make_schema
-from utils import pretty_epoch_time, get_build_directories, rmdir, ERROR_MSG, make_trace
+from utils import pretty_epoch_time, get_build_directories, rmdir, ERROR_MSG, make_trace, UTF8
 from handler_utils import build, upload_procedure, get_settings, join_from_hash, check_secret_key
 from enums import Status, finished
 
@@ -94,7 +94,8 @@ def schema():
     lang = request.values.get('language', 'sv')
     mode = request.values.get('mode', 'plain')
     return_json = make_schema(lang, mode)
-    return Response(json.dumps(return_json, indent=2, ensure_ascii=False),
+    # print(json.dumps(return_json, indent=4, separators=(',', ': '), ensure_ascii=False))
+    return Response(json.dumps(return_json),
                     mimetype="application/json",
                     content_type='application/json; charset=utf-8')
 
@@ -153,12 +154,15 @@ def cleanup_all():
                 b.remove_files()
             else:
                 rmdir(os.path.join(Config.builds_dir, hashnumber))
-        res = ""
+        res = []
         for h in to_remove:
             del builds[h]
-            res += "<removed hash='%s'/>\n" % h
-        if not res:
+            res.append("<removed hash='%s'/>" % h)
+        if len(res) == 0:
             res = "<message>No hashes to be removed.</message>\n"
+        else:
+            res = "\n".join(res)
+            res = "<message>\n%s</message>\n" % res
     else:
         log.error("No builds will be removed.")
         res = "<error>Failed to remove all builds: secret key could not be confirmed.</error>\n"
@@ -252,7 +256,13 @@ def file_upload():
         email = request.values.get('email', '')
         builds = app.config['BUILDS']
         settings, _incremental = get_settings(lang, mode)
-        files = request.files.getlist("file[]")
+        uploaded_files = request.files.getlist("files[]")
+
+        files = []
+        for f in uploaded_files:
+            name = f.filename[:f.filename.rfind(".")]
+            text = f.read().decode(UTF8)
+            files.append((name, text))
 
         def generate(builds, settings, files, email):
             for node in upload_procedure(builds, settings, files, email):
@@ -275,20 +285,15 @@ def download():
 
     # Serve zip file or xml
     if build.files:
-        filepath = build.zipfpath
-        header = ('Content-Disposition', 'attachment; filename="korpus.zip"')
+        filepath = build.directory
+        filename = build.zipfile
+        attachment_filename = "korpus.zip"
         mimetype = 'application/zip'
     else:
-        filepath = build.result_file
-        header = ('Content-Disposition', 'attachment; filename="korpus.xml"')
+        filepath = build.export_dir
+        filename = build.result_file
+        attachment_filename = "korpus.xml"
         mimetype = 'application/xml'
 
-    filelike = open(filepath, "rb")
-
-    def generate(filelike):
-        for byte in iter(lambda: filelike.read(4096), ''):
-            yield byte
-
-    res = Response(generate(filelike), mimetype=mimetype)
-    res.headers.set(header)
-    return res
+    return send_from_directory(filepath, filename, mimetype=mimetype,
+                               as_attachment=True, attachment_filename=attachment_filename)

@@ -42,6 +42,7 @@ class Build(object):
 
         if init_from_hash:
             self.build_hash = init_from_hash
+            # File upload:
             if init_from_hash.endswith(Config.fileupload_ext):
                 original_dir = os.path.join(os.path.join(Config.builds_dir, self.build_hash), 'original')
                 filelist = []
@@ -59,10 +60,11 @@ class Build(object):
         else:
             self.makefile_contents = makefile(settings)
             self.settings = settings
-            # for file upload
+            # File upload
             if files:
                 self.text = "\n".join(text for _fn, text in files)
-                self.build_hash = make_hash(self.text, self.makefile_contents) + Config.fileupload_ext
+                filenames = " ".join(fn for fn, _text in files)
+                self.build_hash = make_hash(self.text, self.makefile_contents, filenames) + Config.fileupload_ext
             else:
                 self.text = text
                 self.filename = 'text'
@@ -81,9 +83,11 @@ class Build(object):
         self.accessed_file = os.path.join(self.directory, 'accessed')
         self.settings_file = os.path.join(self.directory, 'settings.json')
         self.zipfpath = os.path.join(self.directory, "export.zip")
+        self.zipfile = "export.zip"
         if not files:
             self.text_file = os.path.join(self.original_dir, self.filename + '.xml')
-            self.result_file = os.path.join(self.export_dir, self.filename + '.xml')
+            self.result_file_path = os.path.join(self.export_dir, self.filename + '.xml')
+            self.result_file = self.filename + '.xml'
 
         # Deem this build as accessed now, unless resuming an old build
         self.access(resuming)
@@ -353,7 +357,7 @@ class Build(object):
         if self.status == Status.Done:
             if os.listdir(self.export_dir):
                 zipf = zipfile.ZipFile(self.zipfpath, 'w', compression=zipfile.ZIP_DEFLATED)
-                filelike = io.StringIO()
+                filelike = io.BytesIO()
                 with zipfile.ZipFile(filelike, 'w', compression=zipfile.ZIP_DEFLATED) as zipflike:
                     for root, _dirs, files in os.walk(self.export_dir):
                             for xmlfile in files:
