@@ -373,14 +373,20 @@ def positional_attributes(lang, analysis):
         lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
         compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
+        lexical_classes = ["blingbring", "swefn"]
+        sentiment = ["sentiment"]
     elif analysis in ["sv", "sv-1800"]:
-        lexical_attrs = ["pos", "msd", "lemma", "lex", "saldo"]
+        lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
         compound_attrs = ["prefix", "suffix"]
         dependency_attributes = ["ref", "dephead", "deprel"]
+        lexical_classes = None
+        sentiment = None
     else:  # analysis in ["fl", "tt"]
         lexical_attrs = ["pos", "msd", "lemma"]
         compound_attrs = None
         dependency_attributes = None
+        lexical_classes = None
+        sentiment = None
 
     return {
         "title": "Positional attributes",
@@ -391,7 +397,9 @@ def positional_attributes(lang, analysis):
         "default": OrderedDict([
             ("lexical_attributes", lexical_attrs),
             ("compound_attributes", compound_attrs),
-            ("dependency_attributes", dependency_attributes)
+            ("dependency_attributes", dependency_attributes),
+            ("lexical_classes", lexical_classes),
+            ("sentiment", sentiment)
         ]),
         "properties": OrderedDict([
             ("lexical_attributes", {
@@ -430,14 +438,44 @@ def positional_attributes(lang, analysis):
                 "description": "Attributes for the dependency analysis",
                 "description_sv": "Attribut för dependsanalysen",
                 "type": "array",
-                "default": ["ref", "dephead", "deprel"],
+                "default": dependency_attributes,
                 "items": {
                     "title": "Attribute",
                     "title_sv": "Attribut",
                     "type": "string",
-                    "enum": ["ref", "dephead", "deprel"]
+                    "enum": dependency_attributes
                 }
-            } if analysis in ["sv", "sv-dev", "sv-1800"] else None)
+            } if analysis in ["sv", "sv-dev", "sv-1800"] else None),
+
+            ("lexical_classes", {
+                "title": "Lexical classes",
+                "title_sv": "Lexikala klasser",
+                "description": "Attributes for lexical classes",
+                "description_sv": "Attribut för lexikala klasser",
+                "type": "array",
+                "default": lexical_classes,
+                "items": {
+                    "title": "Attribute",
+                    "title_sv": "Attribut",
+                    "type": "string",
+                    "enum": lexical_classes
+                }
+            } if lang == "sv-dev" else None),
+
+            ("sentiment", {
+                "title": "Sentiment analysis",
+                "title_sv": "Attitydanalys",
+                "description": "Attributes for sentiment analysis",
+                "description_sv": "Attribut för attitydanalysen",
+                "type": "array",
+                "default": sentiment,
+                "items": {
+                    "title": "Attribute",
+                    "title_sv": "Attribut",
+                    "type": "string",
+                    "enum": sentiment
+                }
+            } if lang == "sv-dev" else None)
         ]),
     }
 

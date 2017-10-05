@@ -23,6 +23,9 @@ COLUMNS = [('word', 'word'),
            ('complemgram', 'complemgram'),
            ('lemprob', 'lemprob'),
            ('compwf', 'compwf'),
+           ('blingbring', 'blingbring'),
+           ('swefn', 'swefn'),
+           ('sentiment', 'sentiment'),
            ('ref', 'ref'),
            ('dephead.ref', 'dephead'),
            ('deprel', 'deprel')]
@@ -129,7 +132,7 @@ def make_token(settings, columns, xml_cols):
         return [makefile_comment("Using tag " + ws['tag'] + " for words")]
 
 
-def make_sentence(settings, parents, xml_cols, structs, columns):
+def make_sentence(settings, parents, xml_cols, structs, columns, text):
     """Extract info from sentence_segmentation. """
     if settings['sentence_segmentation'].get("sentence_segmenter"):
         sentence_segmenter = settings['sentence_segmentation']["sentence_segmenter"]
@@ -139,6 +142,11 @@ def make_sentence(settings, parents, xml_cols, structs, columns):
         sentence_segmenter = settings['sentence_segmentation']
     if settings['sentence_segmentation'].get('sentence_chunk'):
         sentence_chunk = settings['sentence_segmentation']['sentence_chunk']
+        # Prevent common cause for crash...
+        if sentence_chunk == "paragraph" and settings.get('paragraph_segmentation') == "none":
+            sentence_chunk = text
+            log.warning("'sentence_chunk' set to 'paragraph' but no paragraph segementation was chosen."
+                        "'sentence_chunk' was therefore set to text attribute.")
     else:
         sentence_chunk = None
     return add_segmenter(sentence_segmenter, "sentence", sentence_chunk, parents, xml_cols, structs, columns)
@@ -188,6 +196,20 @@ def add_segmenter(setting, name, chunk, parents, xml_cols, structs, columns):
                           structural=True,
                           filename=name)
         return [makefile_comment("Using tag " + setting['tag'] + " for " + name)]
+
+
+def collect_children(indata):
+    """Generator for all string-values in a dictionary."""
+    if isinstance(indata, dict):
+        for k, v in indata.items():
+            for child_val in collect_children(v):
+                yield child_val
+    elif isinstance(indata, list):
+        for i in indata:
+            yield i
+    else:
+        yield indata
+
 ######################################
 
 
@@ -206,12 +228,8 @@ def make_Makefile(settings):
     structs = []
 
     # Remove positional attributes that should not be generated
-    if lang in ["sv", "sv-dev", "sv-1800"]:
-        columns = [c for c in COLUMNS if c[1] in settings['positional_attributes']['lexical_attributes']
-                   or c[1] in settings['positional_attributes']['compound_attributes']
-                   or c[1] in settings['positional_attributes']['dependency_attributes']]
-    else:
-        columns = [c for c in COLUMNS if c[1] in settings['positional_attributes']['lexical_attributes']]
+    pos_attrs = [i for i in collect_children(settings['positional_attributes'])]
+    columns = [c for c in COLUMNS if c[1] in pos_attrs]
 
     # Add obligatory word annotation
     columns.insert(0, ('word', 'word'))
@@ -251,7 +269,7 @@ def make_Makefile(settings):
 
     # Fix sentence and paragraph segmentation
     if analysis != 'fl':
-        sentence = make_sentence(settings, parents, xml_cols, structs, columns)
+        sentence = make_sentence(settings, parents, xml_cols, structs, columns, text)
         paragraph = make_paragraph(settings, text, parents, xml_cols, structs, columns)
     else:
         sentence = []
