@@ -33,7 +33,7 @@ def make_schema(lang, mode):
             ("extra_tags", extra_tags(mode)),
             ("positional_attributes", positional_attributes(lang, analysis)),
             ("named_entity_recognition", named_entity_recognition(lang)),
-            ("text_attributes", text_attributes)
+            ("text_attributes", text_attributes(lang))
         ]))
     ])
     # Remove entries with None values
@@ -499,32 +499,49 @@ def named_entity_recognition(lang):
     else:
         return None
 
-text_attributes = {
-    "title": "Text attributes",
-    "title_sv": "Textattribut",
-    "description": "Text attributes to generate in the analysis. Attributes already present under 'Root tag > Structural attributes' must not appear here again.",
-    "description_sv": "Textattribut som ska genereras i analysen. Attribut som har valts under 'Rottagg > Strukturella attribut' får inte förekomma här.",
-    "type": "object",
-    "default": {
-        "readibility_metrics": ["lix", "ovix", "nk"]
-    },
-    "properties": {
-        "readibility_metrics": {
-            "title": "Readibility metrics",
-            "title_sv": "Läsbarhetsindex",
-            "description": "Attributes for different readibility metrics",
-            "description_sv": "Attribut för olika sorters läsbarhetsindex",
-            "type": "array",
-            "default": ["lix", "ovix", "nk"],
-            "items": {
-                "title": "Attribute",
-                "title_sv": "Attribut",
-                "type": "string",
-                "enum": ["lix", "ovix", "nk"]
-            }
-        }
+
+def text_attributes(lang):
+    return {
+        "title": "Text attributes",
+        "title_sv": "Textattribut",
+        "description": "Text attributes to generate in the analysis. Attributes already present under 'Root tag > Structural attributes' must not appear here again.",
+        "description_sv": "Textattribut som ska genereras i analysen. Attribut som har valts under 'Rottagg > Strukturella attribut' får inte förekomma här.",
+        "type": "object",
+        "default": OrderedDict([
+            ("readibility_metrics", ["lix", "ovix", "nk"]),
+            ("lexical_classes", ["blingbring", "swefn"] if lang == "sv-dev" else None)
+        ]),
+        "properties": OrderedDict([
+            ("readibility_metrics", {
+                "title": "Readibility metrics",
+                "title_sv": "Läsbarhetsvärden",
+                "description": "Attributes for different readibility metrics",
+                "description_sv": "Attribut för olika sorters läsbarhetsvärden",
+                "type": "array",
+                "default": ["lix", "ovix", "nk"],
+                "items": {
+                    "title": "Attribute",
+                    "title_sv": "Attribut",
+                    "type": "string",
+                    "enum": ["lix", "ovix", "nk"]
+                }
+            }),
+            ("lexical_classes", {
+                "title": "Lexical classes (document)",
+                "title_sv": "Lexikala klasser (dokument)",
+                "description": "Attributes for lexical classes on document level",
+                "description_sv": "Attribut för lexikala klasser på dokumentnivå",
+                "type": "array",
+                "default": ["blingbring", "swefn"],
+                "items": {
+                    "title": "Attribute",
+                    "title_sv": "Attribut",
+                    "type": "string",
+                    "enum": ["blingbring", "swefn"]
+                }
+            } if lang == "sv-dev" else None)
+        ])
     }
-}
 
 
 def remove_nones(json_input, parent_key=None):

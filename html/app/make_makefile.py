@@ -10,7 +10,7 @@ log = logging.getLogger('pipeline.' + __name__)
 
 DEFAULT_ROOT = "text"
 
-# Default column annotations
+# Column annotations, only needed to preserve order
 COLUMNS = [('word', 'word'),
            ('pos', 'pos'),
            ('msd', 'msd'),
@@ -300,8 +300,8 @@ def make_Makefile(settings):
 
     # Add text attributes
     if settings.get('text_attributes'):
-        if "readibility_metrics" in settings['text_attributes']:
-            add_structural_attributes(text, settings['text_attributes']['readibility_metrics'], is_root=True)
+        for group in settings['text_attributes']:
+            add_structural_attributes(text, settings['text_attributes'][group], is_root=True)
 
     # Add the root tag to xml and its attributes
     add_structural_attributes(text, settings['root']['attributes'], add_xml=True, is_root=True)
