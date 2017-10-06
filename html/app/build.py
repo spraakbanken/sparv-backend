@@ -286,7 +286,7 @@ class Build(object):
         # Do a dry run to get the number of invocations that will be made
         stdout, stderr = make(make_settings + ['--dry-run']).communicate("")
         self.stderr = stderr.decode(UTF8)
-        assert self.stderr == ""
+        assert(self.stderr == "")
         steps = stdout.decode(UTF8).count(Config.python_interpreter)
 
         # No remote installations allowed
@@ -332,7 +332,6 @@ class Build(object):
         try:
             self._run(fmt)
         except:
-            log.info("EXCEPTION DURING _run")
             self.trace = make_trace()
             log.exception(ERROR_MSG["make_error"])
             self.stdout = "".join(self.make_out)
