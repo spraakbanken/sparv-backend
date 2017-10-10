@@ -10,4 +10,4 @@ errorlog = os.path.join(Config.log_dir, "gunicorn.log")
 
 timeout = 200           # workers silent for more than this many seconds are killed and restarted
 bind = '0.0.0.0:8801'   # the socket to bind
-workers = 2             # number of worker process for handling requests
+workers = 1             # number of worker process for handling requests
