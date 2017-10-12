@@ -371,19 +371,20 @@ def extra_tags(mode):
 def positional_attributes(lang, analysis):
     if lang == "sv-dev":
         lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
-        compound_attrs = ["complemgram", "compwf"]
+        compound_attrs = default_compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
         lexical_classes = ["blingbring", "swefn"]
         sentiment = ["sentiment"]
     elif analysis in ["sv", "sv-1800"]:
         lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
-        compound_attrs = ["prefix", "suffix"]
+        compound_attrs = ["complemgram", "compwf", "prefix", "suffix"]
+        default_compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
         lexical_classes = None
-        sentiment = None
+        sentiment = ["sentiment"]
     else:  # analysis in ["fl", "tt"]
         lexical_attrs = ["pos", "msd", "lemma"]
-        compound_attrs = None
+        compound_attrs = default_compound_attrs = None
         dependency_attributes = None
         lexical_classes = None
         sentiment = None
@@ -396,7 +397,7 @@ def positional_attributes(lang, analysis):
         "type": "object",
         "default": OrderedDict([
             ("lexical_attributes", lexical_attrs),
-            ("compound_attributes", compound_attrs),
+            ("compound_attributes", default_compound_attrs),
             ("dependency_attributes", dependency_attributes),
             ("lexical_classes", lexical_classes),
             ("sentiment", sentiment)
@@ -475,19 +476,19 @@ def positional_attributes(lang, analysis):
                     "type": "string",
                     "enum": sentiment
                 }
-            } if lang == "sv-dev" else None)
+            } if lang in ["sv", "sv-dev", "sv-1800"] else None)
         ]),
     }
 
 
 def named_entity_recognition(lang):
-    if lang == "sv-dev":
+    if lang in ["sv", "sv-dev", "sv-1800"]:
         return {
             "title": "Named entity recognition",
             "title_sv": "Namntaggare",
             "description": "Structural attributes for named entity recognition",
             "description_sv": "Strukturella attribut for namnigenkänning",
-            "default": ["ex", "type", "subtype"],
+            "default": ["ex", "type", "subtype"] if lang == "sv-dev" else [],
             "type": "array",
             "items": {
                 "title": "Attribute",
