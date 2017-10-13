@@ -121,12 +121,15 @@ def cleanup(timeout=604800, remove_errors=False):
                 log.info("Removing %s" % h)
                 b.remove_files()
                 to_remove.append(h)
-        res = ""
+        res = []
         for h in to_remove:
             del builds[h]
-            res += "<removed hash='%s'/>\n" % h
-        if not res:
+            res.append("<removed hash='%s'/>" % h)
+        if len(res) == 0:
             res = "<message>No hashes to be removed.</message>\n"
+        else:
+            res = "\n".join(res)
+            res = "<message>\n%s</message>\n" % res
     else:
         res = "<error>Failed to run cleanup: secret key could not be confirmed.</error>\n"
 
