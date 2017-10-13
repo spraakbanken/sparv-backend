@@ -144,7 +144,7 @@ def make_sentence(settings, parents, xml_cols, structs, columns, text):
         sentence_chunk = settings['sentence_segmentation']['sentence_chunk']
         # Prevent common cause for crash...
         if sentence_chunk == "paragraph" and settings.get('paragraph_segmentation') == "none":
-            sentence_chunk = text
+            sentence_chunk = DEFAULT_ROOT
             log.warning("'sentence_chunk' set to 'paragraph' but no paragraph segementation was chosen."
                         "'sentence_chunk' was therefore set to text attribute.")
     else:
@@ -164,7 +164,7 @@ def make_paragraph(settings, text, parents, xml_cols, structs, columns):
         if settings['paragraph_segmentation'].get('paragraph_chunk'):
             paragraph_chunk = settings['paragraph_segmentation'].get('paragraph_chunk', "root")
             if paragraph_chunk == "root":
-                paragraph_chunk = text
+                paragraph_chunk = DEFAULT_ROOT
         else:
             paragraph_chunk = text
         return add_segmenter(paragraph_segmenter, "paragraph", paragraph_chunk, parents, xml_cols, structs, columns)

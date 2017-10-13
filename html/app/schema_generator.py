@@ -45,10 +45,10 @@ def make_schema(lang, mode):
 
 
 struct_tag = {
-    "title": "Structural attribute tag",
-    "title_sv": "Strukturellt-attribut-tagg",
-    "description": "A tag for a structral attribute",
-    "description_sv": "En tagg för ett strukturellt attribut",
+    "title": "Structural element tag",
+    "title_sv": "Strukturellt-element-tagg",
+    "description": "A tag for a structral element",
+    "description_sv": "En tagg för ett strukturellt element",
     "type": "object",
     "properties": OrderedDict([
         ("tag", {
@@ -319,8 +319,8 @@ def paragraph_segmenter_tool(mode):
                 "default": "root",
                 "type": [
                     {
-                        "title": "Root tag",
-                        "title_sv": "Rottagg",
+                        "title": "Document element",
+                        "title_sv": "Dokumentelement",
                         "type": "string",
                         "enum": ["root"],
                         "class": "typewriter"
@@ -335,10 +335,10 @@ def paragraph_segmenter_tool(mode):
 def root(mode):
     if mode != "plain":
         return {
-            "title": "Root tag",
-            "title_sv": "Rottagg",
-            "description": "The name of the root tag, with optional attributes",
-            "description_sv": "Root-taggens namn, med valfria attribut",
+            "title": "Document element",
+            "title_sv": "Dokumentelement",
+            "description": "The name of the document element, with optional attributes",
+            "description_sv": "Namnet på dokumentelementet, med valfria attribut",
             "default": {
                 "tag": "text",
                 "attributes": []
@@ -354,10 +354,10 @@ def root(mode):
 def extra_tags(mode):
     if mode != "plain":
         return {
-            "title": "Extra structural attributes",
-            "title_sv": "Ytterligare strukturella attribut",
-            "description": "Additional structural attributes in the XML",
-            "description_sv": "Ytterligare strukturella attribut i XML:en",
+            "title": "Extra structural elements",
+            "title_sv": "Ytterligare strukturella element",
+            "description": "Additional structural elements in the XML",
+            "description_sv": "Ytterligare strukturella element i XML:en",
             "type": "array",
             "default": [],
             "items": {
@@ -505,8 +505,8 @@ def text_attributes(lang):
     return {
         "title": "Text attributes",
         "title_sv": "Textattribut",
-        "description": "Text attributes to generate in the analysis. Attributes already present under 'Root tag > Structural attributes' must not appear here again.",
-        "description_sv": "Textattribut som ska genereras i analysen. Attribut som har valts under 'Rottagg > Strukturella attribut' får inte förekomma här.",
+        "description": "Text attributes to generate in the analysis. Attributes already present under 'Document element > Structural attributes' must not appear here again.",
+        "description_sv": "Textattribut som ska genereras i analysen. Attribut som har valts under 'Dokumentelement > Strukturella attribut' får inte förekomma här.",
         "type": "object",
         "default": OrderedDict([
             ("readibility_metrics", ["lix", "ovix", "nk"]),
