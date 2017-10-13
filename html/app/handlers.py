@@ -75,6 +75,8 @@ def ping():
         from subprocess import Popen, PIPE
         cmd = [Config.catalaunch_binary, Config.socket_file, "PING"]
         stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
+        stdout = stdout.decode(UTF8)
+        stderr = stderr.decode(UTF8)
         t1 = time.time()
     except BaseException as e:
         xml = "<error>Failed to ping catapult: %s</error>\n" % e
