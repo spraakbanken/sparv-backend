@@ -75,11 +75,17 @@ def add_parent(tag, parents):
 
 
 def mk_xml_attr(tag, attr):
-    return tag + ":" + attr
+    if attr:
+        return tag + ":" + attr
+    else:
+        return tag
 
 
 def mk_file_attr(tag, attr):
-    return tag + "." + attr
+    if attr:
+        return tag + "." + attr
+    else:
+        return tag
 
 
 def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None, add_xml=True):
@@ -210,6 +216,21 @@ def collect_children(indata):
     else:
         yield indata
 
+
+def remove_order(indata):
+    """Recursively remove order attribute from indata dict."""
+    if isinstance(indata, dict):
+        for k, v in indata.items():
+            if k == "order":
+                indata.pop("order")
+            for child_val in remove_order(v):
+                yield child_val
+    elif isinstance(indata, list):
+        for i in indata:
+            yield i
+    else:
+        yield indata
+
 ######################################
 
 
@@ -223,6 +244,9 @@ def make_Makefile(settings):
     else:
         lang = 'sv'
     analysis = TOOL_DICT[lang]
+
+    # Remove order attribute (only needed by the frontend for display of settings)
+    [i for i in remove_order(settings)]
 
     # vrt_structs[_annotations]
     structs = []
@@ -281,15 +305,18 @@ def make_Makefile(settings):
                 xml_cols.append((tag, DEFAULT_ROOT))
             else:
                 xml_cols.append((tag, tag))
-        if len(attributes) > 0:
-            add_parent(tag, parents)
-            if is_root:
-                filename = tag
-                tag = DEFAULT_ROOT
-            else:
-                tag = tag
-                filename = None
-            for attr in attributes:
+        add_parent(tag, parents)
+        if is_root:
+            filename = tag
+            tag = DEFAULT_ROOT
+        else:
+            tag = tag
+            filename = None
+        # First, add tag without attributes
+        add_attribute(tag, '', xml_cols, structs, columns,
+                      structural=True, filename=filename, add_xml=False)
+        for attr in attributes:
+            if attr:  # attr != ''
                 add_attribute(tag, attr, xml_cols, structs, columns,
                               structural=True, filename=filename, add_xml=add_xml)
 
