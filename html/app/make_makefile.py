@@ -90,8 +90,8 @@ def mk_file_attr(tag, attr):
 
 def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None, add_xml=True):
     filename = filename or tag
-    xml_attr = mk_xml_attr(filename, attr)
-    file_attr = mk_file_attr(tag, attr)
+    xml_attr = mk_xml_attr(tag, attr)
+    file_attr = mk_file_attr(filename, attr)
     struct_attr = mk_xml_attr(filename, attr)
     if add_xml:
         xml_cols.append((xml_attr, file_attr))
