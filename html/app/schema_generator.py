@@ -509,14 +509,14 @@ def text_attributes(lang):
         "description_sv": "Textattribut som ska genereras i analysen. Attribut som har valts under 'Dokumentelement > Strukturella attribut' får inte förekomma här.",
         "type": "object",
         "default": OrderedDict([
-            ("readibility_metrics", ["lix", "ovix", "nk"]),
+            ("readability_metrics", ["lix", "ovix", "nk"]),
             ("lexical_classes", ["blingbring", "swefn"] if lang == "sv-dev" else None)
         ]),
         "properties": OrderedDict([
-            ("readibility_metrics", {
-                "title": "Readibility metrics",
+            ("readability_metrics", {
+                "title": "Readability metrics",
                 "title_sv": "Läsbarhetsvärden",
-                "description": "Attributes for different readibility metrics",
+                "description": "Attributes for different readability metrics",
                 "description_sv": "Attribut för olika sorters läsbarhetsvärden",
                 "type": "array",
                 "default": ["lix", "ovix", "nk"],
