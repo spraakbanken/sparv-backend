@@ -1,4 +1,4 @@
-<style>
+<p><style>
     body {
       margin-top: 2em;
       margin-left: 2em;
@@ -22,17 +22,24 @@
     ul {
         list-style-type: circle;
     }
-</style>
-<h1 id="sparv-api">Sparv API</h1>
-<p>Read Sparv's API documentation: <a href="https://spraakbanken.gu.se/eng/research/infrastructure/sparv/webservice" class="uri">https://spraakbanken.gu.se/eng/research/infrastructure/sparv/webservice</a></p>
-<h2 id="available-queries">Available queries</h2>
+</style></p>
+
+<h1>Sparv API</h1>
+
+<p>Read Sparv's API documentation:
+<a href="https://spraakbanken.gu.se/eng/research/infrastructure/sparv/webservice">https://spraakbanken.gu.se/eng/research/infrastructure/sparv/webservice</a></p>
+
+<h2>Available queries</h2>
+
 <ul>
-<li>/api
+<li><p>/api</p>
+
 <ul>
 <li>description: Shows this short API description.</li>
 <li>methods: GET</li>
 </ul></li>
-<li>/
+<li><p>/</p>
+
 <ul>
 <li>description: Handles text input and runs the analysis.</li>
 <li>methods: GET, POST</li>
@@ -45,17 +52,20 @@
 <li>incremental, default: False</li>
 </ul></li>
 </ul></li>
-<li>/status
+<li><p>/status</p>
+
 <ul>
 <li>description: Returns the status of existing builds.</li>
 <li>methods: GET</li>
 </ul></li>
-<li>/ping
+<li><p>/ping</p>
+
 <ul>
 <li>description: Pings the backend, responds with the status of the catapult.</li>
 <li>methods: GET</li>
 </ul></li>
-<li>/schema
+<li><p>/schema</p>
+
 <ul>
 <li>description: Returns the json schema generated from the parameters provided.</li>
 <li>methods: GET</li>
@@ -65,7 +75,8 @@
 <li>mode, default: plain</li>
 </ul></li>
 </ul></li>
-<li>/makefile
+<li><p>/makefile</p>
+
 <ul>
 <li>description: Returns the Makefile generated from the parameters provided.</li>
 <li>methods: GET, POST</li>
@@ -77,7 +88,8 @@
 <li>incremental, default: False</li>
 </ul></li>
 </ul></li>
-<li>/upload
+<li><p>/upload</p>
+
 <ul>
 <li>description: Handles upload of files and runs the analysis.</li>
 <li>methods: GET, POST</li>
@@ -90,7 +102,8 @@
 <li>settings</li>
 </ul></li>
 </ul></li>
-<li>/download
+<li><p>/download</p>
+
 <ul>
 <li>description:</li>
 <li>methods: GET</li>
@@ -99,7 +112,8 @@
 <li>hash, default: ''</li>
 </ul></li>
 </ul></li>
-<li>/join
+<li><p>/join</p>
+
 <ul>
 <li>description: Joins an existing build.</li>
 <li>methods: GET, POST</li>
@@ -111,25 +125,30 @@
 <li>incremental, default: False</li>
 </ul></li>
 </ul></li>
-<li>/cleanup
+<li><p>/cleanup</p>
+
 <ul>
-<li>description: Removes builds that are finished and haven't been accessed within the timeout (7 days). Requires secret_key parameter in query.</li>
+<li>description: Removes builds that are finished and haven't been accessed within the timeout (7 days).
+Requires secret_key parameter in query.</li>
 <li>methods: GET</li>
 <li>params:
 <ul>
 <li>secret_key, default: ''</li>
 </ul></li>
 </ul></li>
-<li>/cleanup/errors
+<li><p>/cleanup/errors</p>
+
 <ul>
-<li>description: Removes builds that are finished and haven't been accessed within the timeout (7 days) and the builds with status Error. Requires secret_key parameter in query.</li>
+<li>description: Removes builds that are finished and haven't been accessed within the timeout (7 days) and
+the builds with status Error. Requires secret_key parameter in query.</li>
 <li>methods: GET</li>
 <li>params:
 <ul>
 <li>secret_key, default: ''</li>
 </ul></li>
 </ul></li>
-<li>/cleanup/forceall
+<li><p>/cleanup/forceall</p>
+
 <ul>
 <li>description: Removes all the existing builds. Requires secret_key parameter in query.</li>
 <li>methods: GET</li>
@@ -139,100 +158,119 @@
 </ul></li>
 </ul></li>
 </ul>
-<h2 id="example-settings">Example settings</h2>
-<p>Swedish plain text input (default mode):</p>
-<pre><code>settings={
-    &quot;corpus&quot;:&quot;untitled&quot;,
-    &quot;lang&quot;:&quot;sv&quot;,
-    &quot;textmode&quot;:&quot;plain&quot;,
-    &quot;word_segmenter&quot;:&quot;default_tokenizer&quot;,
-    &quot;sentence_segmentation&quot;:{
-        &quot;sentence_segmenter&quot;:&quot;default_tokenizer&quot;,
-        &quot;sentence_chunk&quot;:&quot;paragraph&quot;
-        },
-    &quot;paragraph_segmentation&quot;:{
-        &quot;paragraph_segmenter&quot;:&quot;blanklines&quot;,
-        &quot;paragraph_chunk&quot;:&quot;root&quot;
-        },
-    &quot;root&quot;:{
-        &quot;tag&quot;:&quot;text&quot;,
-        &quot;attributes&quot;:[]
-        },
-    &quot;extra_tags&quot;:[],
-    &quot;positional_attributes&quot;:{
-        &quot;dependency_attributes&quot;:[&quot;ref&quot;,&quot;dephead&quot;,&quot;deprel&quot;],
-        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;,&quot;lex&quot;,&quot;saldo&quot;],
-        &quot;compound_attributes&quot;:[&quot;prefix&quot;,&quot;suffix&quot;]
-        }
-    }</code></pre>
-<p>Swedish with xml input:</p>
-<pre><code>settings={
-    &quot;corpus&quot;:&quot;exempelkorpus&quot;,
-    &quot;lang&quot;:&quot;sv&quot;,
-    &quot;textmode&quot;:&quot;xml&quot;,
-    &quot;word_segmenter&quot;:&quot;default_tokenizer&quot;,
-    &quot;sentence_segmentation&quot;:{
-        &quot;tag&quot;:&quot;s&quot;,
-        &quot;attributes&quot;:[&quot;number&quot;]
-        },
-    &quot;paragraph_segmentation&quot;:{
-        &quot;tag&quot;:&quot;p&quot;,
-        &quot;attributes&quot;:[&quot;name&quot;]
-        },
-    &quot;root&quot;:{
-        &quot;tag&quot;:&quot;text&quot;,
-        &quot;attributes&quot;:[&quot;title&quot;]
-        },
-    &quot;extra_tags&quot;:[
+
+<h2>Example settings</h2>
+
+<p>Swedish plain text input (default mode):
+<pre><code>
+settings={
+    "corpus": "untitled",
+    "lang": "sv",
+    "textmode": "plain",
+    "word_segmenter": "default_tokenizer",
+    "sentence_segmentation": {
+        "sentence_chunk": "paragraph",
+        "sentence_segmenter": "default_tokenizer"
+    },
+    "paragraph_segmentation": {
+        "paragraph_segmenter": "blanklines"
+    },
+    "positional_attributes": {
+        "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense"],
+        "compound_attributes": ["complemgram", "compwf"],
+        "dependency_attributes": ["ref", "dephead", "deprel"],
+        "sentiment": ["sentiment"]
+    },
+    "named_entity_recognition": [],
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix", "nk"]
+    }
+}
+</code></pre></p>
+
+<p>Swedish with xml input:
+<pre><code>
+settings={
+    "corpus": "exempelkorpus",
+    "lang": "sv",
+    "textmode": "xml",
+    "word_segmenter": "default_tokenizer",
+    "sentence_segmentation": {
+        "tag": "s",
+        "attributes": ["number"]
+    },
+    "paragraph_segmentation": {
+        "tag": "p",
+        "attributes": ["name"]
+    },
+    "root": {
+        "tag": "text",
+        "attributes": ["title"]
+    },
+    "extra_tags": [
         {
-            &quot;tag&quot;:&quot;chapter&quot;,
-            &quot;attributes&quot;:[&quot;name&quot;]
-            }
-        ],
-    &quot;positional_attributes&quot;:{
-        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;,&quot;lex&quot;,&quot;saldo&quot;],
-        &quot;compound_attributes&quot;:[&quot;prefix&quot;,&quot;suffix&quot;],
-        &quot;dependency_attributes&quot;:[&quot;ref&quot;,&quot;dephead&quot;,&quot;deprel&quot;]
+            "tag": "chapter",
+            "attributes": ["name"]
         }
-    }</code></pre>
-<p>English:</p>
-<pre><code>settings={
-    &quot;corpus&quot;:&quot;untitled&quot;,
-    &quot;lang&quot;:&quot;en&quot;,
-    &quot;textmode&quot;:&quot;plain&quot;,
-    &quot;positional_attributes&quot;:{
-        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;]
-        },
-    &quot;text_attributes&quot;:{
-        &quot;readibility_metrics&quot;:[&quot;lix&quot;,&quot;ovix&quot;,&quot;nk&quot;]
-        }
-    }</code></pre>
-<p>Swedish development mode (Sparv labs):</p>
-<pre><code>settings={
-    &quot;corpus&quot;:&quot;untitled&quot;,
-    &quot;lang&quot;:&quot;sv-dev&quot;,
-    &quot;textmode&quot;:&quot;plain&quot;,
-    &quot;word_segmenter&quot;:&quot;default_tokenizer&quot;,
-    &quot;sentence_segmentation&quot;:{
-        &quot;sentence_segmenter&quot;:&quot;default_tokenizer&quot;,
-        &quot;sentence_chunk&quot;:&quot;paragraph&quot;
-        },
-    &quot;paragraph_segmentation&quot;:{
-        &quot;paragraph_segmenter&quot;:&quot;blanklines&quot;,
-        &quot;paragraph_chunk&quot;:&quot;root&quot;
-        },
-    &quot;root&quot;:{
-        &quot;tag&quot;:&quot;text&quot;,
-        &quot;attributes&quot;:[]
-        },
-    &quot;extra_tags&quot;:[],
-    &quot;positional_attributes&quot;:{
-        &quot;dependency_attributes&quot;:[&quot;ref&quot;,&quot;dephead&quot;,&quot;deprel&quot;],
-        &quot;lexical_attributes&quot;:[&quot;pos&quot;,&quot;msd&quot;,&quot;lemma&quot;,&quot;lex&quot;,&quot;sense&quot;],
-        &quot;compound_attributes&quot;:[&quot;complemgram&quot;,&quot;compwf&quot;]
-        },
-    &quot;named_entity_recognition&quot;:[&quot;ex&quot;,&quot;type&quot;,&quot;subtype&quot;],
-    &quot;text_attributes&quot;:{
-        &quot;readibility_metrics&quot;:[&quot;lix&quot;,&quot;ovix&quot;,&quot;nk&quot;]
-        }
-    }</code></pre>
+    ],
+    "positional_attributes": {
+        "lexical_attributes": [ "pos", "msd", "lemma", "lex", "sense"],
+        "compound_attributes": ["complemgram", "compwf"],
+        "dependency_attributes": ["ref", "dephead", "deprel"],
+        "sentiment": ["sentiment"]
+    },
+    "named_entity_recognition": [],
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix", "nk"]
+    }
+}
+</code></pre></p>
+
+<p>English:
+<pre><code>
+settings={
+    "corpus": "untitled",
+    "lang": "en",
+    "textmode": "xml",
+    "root": {
+        "tag": "text",
+        "attributes": []
+    },
+    "extra_tags": [],
+    "positional_attributes": {
+        "lexical_attributes": ["pos", "msd", "lemma"]
+    },
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix", "nk"]
+    }
+}
+</code></pre></p>
+
+<p>Swedish development mode (Sparv labs):
+<pre><code>
+settings={
+    "corpus": "untitled",
+    "lang": "sv-dev",
+    "textmode": "plain",
+    "word_segmenter": "default_tokenizer",
+    "sentence_segmentation": {
+        "sentence_chunk": "paragraph",
+        "sentence_segmenter": "default_tokenizer"
+    },
+    "paragraph_segmentation": {
+        "paragraph_segmenter": "blanklines"
+    },
+    "positional_attributes": {
+        "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense"],
+        "compound_attributes": ["complemgram", "compwf"],
+        "dependency_attributes": ["ref", "dephead", "deprel"],
+        "lexical_classes": ["blingbring", "swefn"],
+        "sentiment": ["sentiment"]
+    },
+    "named_entity_recognition": ["ex", "type", "subtype"],
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix","nk"],
+        "lexical_classes": ["blingbring", "swefn"]
+    }
+}
+</code></pre></p>

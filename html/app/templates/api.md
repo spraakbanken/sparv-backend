@@ -122,107 +122,113 @@ Read Sparv's API documentation:
 Swedish plain text input (default mode):
 ```
 settings={
-    "corpus":"untitled",
-    "lang":"sv",
-    "textmode":"plain",
-    "word_segmenter":"default_tokenizer",
-    "sentence_segmentation":{
-        "sentence_segmenter":"default_tokenizer",
-        "sentence_chunk":"paragraph"
-        },
-    "paragraph_segmentation":{
-        "paragraph_segmenter":"blanklines",
-        "paragraph_chunk":"root"
-        },
-    "root":{
-        "tag":"text",
-        "attributes":[]
-        },
-    "extra_tags":[],
-    "positional_attributes":{
-        "dependency_attributes":["ref","dephead","deprel"],
-        "lexical_attributes":["pos","msd","lemma","lex","saldo"],
-        "compound_attributes":["prefix","suffix"]
-        }
+    "corpus": "untitled",
+    "lang": "sv",
+    "textmode": "plain",
+    "word_segmenter": "default_tokenizer",
+    "sentence_segmentation": {
+        "sentence_chunk": "paragraph",
+        "sentence_segmenter": "default_tokenizer"
+    },
+    "paragraph_segmentation": {
+        "paragraph_segmenter": "blanklines"
+    },
+    "positional_attributes": {
+        "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense"],
+        "compound_attributes": ["complemgram", "compwf"],
+        "dependency_attributes": ["ref", "dephead", "deprel"],
+        "sentiment": ["sentiment"]
+    },
+    "named_entity_recognition": [],
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix", "nk"]
     }
+}
 ```
 
 Swedish with xml input:
 ```
 settings={
-    "corpus":"exempelkorpus",
-    "lang":"sv",
-    "textmode":"xml",
-    "word_segmenter":"default_tokenizer",
-    "sentence_segmentation":{
-        "tag":"s",
-        "attributes":["number"]
-        },
-    "paragraph_segmentation":{
-        "tag":"p",
-        "attributes":["name"]
-        },
-    "root":{
-        "tag":"text",
-        "attributes":["title"]
-        },
-    "extra_tags":[
+    "corpus": "exempelkorpus",
+    "lang": "sv",
+    "textmode": "xml",
+    "word_segmenter": "default_tokenizer",
+    "sentence_segmentation": {
+        "tag": "s",
+        "attributes": ["number"]
+    },
+    "paragraph_segmentation": {
+        "tag": "p",
+        "attributes": ["name"]
+    },
+    "root": {
+        "tag": "text",
+        "attributes": ["title"]
+    },
+    "extra_tags": [
         {
-            "tag":"chapter",
-            "attributes":["name"]
-            }
-        ],
-    "positional_attributes":{
-        "lexical_attributes":["pos","msd","lemma","lex","saldo"],
-        "compound_attributes":["prefix","suffix"],
-        "dependency_attributes":["ref","dephead","deprel"]
+            "tag": "chapter",
+            "attributes": ["name"]
         }
+    ],
+    "positional_attributes": {
+        "lexical_attributes": [ "pos", "msd", "lemma", "lex", "sense"],
+        "compound_attributes": ["complemgram", "compwf"],
+        "dependency_attributes": ["ref", "dephead", "deprel"],
+        "sentiment": ["sentiment"]
+    },
+    "named_entity_recognition": [],
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix", "nk"]
     }
+}
 ```
 
 English:
 ```
 settings={
-    "corpus":"untitled",
-    "lang":"en",
-    "textmode":"plain",
-    "positional_attributes":{
-        "lexical_attributes":["pos","msd","lemma"]
-        },
-    "text_attributes":{
-        "readibility_metrics":["lix","ovix","nk"]
-        }
+    "corpus": "untitled",
+    "lang": "en",
+    "textmode": "xml",
+    "root": {
+        "tag": "text",
+        "attributes": []
+    },
+    "extra_tags": [],
+    "positional_attributes": {
+        "lexical_attributes": ["pos", "msd", "lemma"]
+    },
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix", "nk"]
     }
+}
 ```
 
 Swedish development mode (Sparv labs):
 ```
 settings={
-    "corpus":"untitled",
-    "lang":"sv-dev",
-    "textmode":"plain",
-    "word_segmenter":"default_tokenizer",
-    "sentence_segmentation":{
-        "sentence_segmenter":"default_tokenizer",
-        "sentence_chunk":"paragraph"
-        },
-    "paragraph_segmentation":{
-        "paragraph_segmenter":"blanklines",
-        "paragraph_chunk":"root"
-        },
-    "root":{
-        "tag":"text",
-        "attributes":[]
-        },
-    "extra_tags":[],
-    "positional_attributes":{
-        "dependency_attributes":["ref","dephead","deprel"],
-        "lexical_attributes":["pos","msd","lemma","lex","sense"],
-        "compound_attributes":["complemgram","compwf"]
-        },
-    "named_entity_recognition":["ex","type","subtype"],
-    "text_attributes":{
-        "readibility_metrics":["lix","ovix","nk"]
-        }
+    "corpus": "untitled",
+    "lang": "sv-dev",
+    "textmode": "plain",
+    "word_segmenter": "default_tokenizer",
+    "sentence_segmentation": {
+        "sentence_chunk": "paragraph",
+        "sentence_segmenter": "default_tokenizer"
+    },
+    "paragraph_segmentation": {
+        "paragraph_segmenter": "blanklines"
+    },
+    "positional_attributes": {
+        "lexical_attributes": ["pos", "msd", "lemma", "lex", "sense"],
+        "compound_attributes": ["complemgram", "compwf"],
+        "dependency_attributes": ["ref", "dephead", "deprel"],
+        "lexical_classes": ["blingbring", "swefn"],
+        "sentiment": ["sentiment"]
+    },
+    "named_entity_recognition": ["ex", "type", "subtype"],
+    "text_attributes": {
+        "readability_metrics": ["lix", "ovix","nk"],
+        "lexical_classes": ["blingbring", "swefn"]
     }
+}
 ```
