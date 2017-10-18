@@ -41,4 +41,4 @@ deactivate
 
 # Setup cronjob:
 # MAILTO=""
-# 1 0 * * * curl https://ws/spraakbanken.gu.se/ws/sparv/v2/cleanup
+# 1 0 * * * curl https://ws.spraakbanken.gu.se/ws/sparv/v2/cleanup?secret_key=
