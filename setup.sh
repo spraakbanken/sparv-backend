@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check out backend from:
-# svn checkout https://svn.spraakdata.gu.se/repos/sparv/backend/
+# svn checkout https://svn.spraakdata.gu.se/repos/sparv/backend/ .
 set -x
 
 echo "Creating venv for backend"
@@ -36,4 +36,9 @@ pip install -r requirements.txt
 deactivate
 
 
-# Run backend with venv/bin/gunicorn -b 0.0.0.0:58444 index
+# Run backend with:
+# PATH_TO_BACKEND/html/app/venv/bin/gunicorn --chdir PATH_TO_BACKEND/html/app -c PATH_TO_BACKEND/html/app/gunicorn_config.py index
+
+# Setup cronjob:
+# MAILTO=""
+# 1 0 * * * curl https://ws/spraakbanken.gu.se/ws/sparv/v2/cleanup
