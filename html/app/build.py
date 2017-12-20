@@ -363,8 +363,9 @@ class Build(object):
                 with zipfile.ZipFile(filelike, 'w', compression=zipfile.ZIP_DEFLATED) as zipflike:
                     for root, _dirs, files in os.walk(self.export_dir):
                             for xmlfile in files:
-                                zipflike.write(os.path.join(root, xmlfile), arcname="korpus/" + xmlfile)
-                                zipf.write(os.path.join(root, xmlfile), arcname="korpus/" + xmlfile)
+                                newfilename = xmlfile[:-4] + "_annotated.xml"
+                                zipflike.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
+                                zipf.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
                 return filelike
             else:
                 # används inte just nu
