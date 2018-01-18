@@ -89,14 +89,16 @@ def mk_file_attr(tag, attr):
 
 
 def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None, add_xml=True):
+    log.warning("%s %s %s" % (tag, attr, structs))
     filename = filename or tag
     xml_attr = mk_xml_attr(tag, attr)
     file_attr = mk_file_attr(filename, attr)
-    struct_attr = mk_xml_attr(filename, attr)
+    struct_attr = mk_xml_attr(tag, attr)
     if add_xml:
         xml_cols.append((xml_attr, file_attr))
     if structural:
-        structs.append((file_attr, struct_attr))
+        if (file_attr, struct_attr) not in structs:
+            structs.append((file_attr, struct_attr))
     else:
         columns.append((file_attr, struct_attr))
 
@@ -307,10 +309,8 @@ def make_Makefile(settings):
                 xml_cols.append((tag, tag))
         add_parent(tag, parents)
         if is_root:
-            filename = tag
-            tag = DEFAULT_ROOT
+            filename = DEFAULT_ROOT
         else:
-            tag = tag
             filename = None
         # First, add tag without attributes
         add_attribute(tag, '', xml_cols, structs, columns,
