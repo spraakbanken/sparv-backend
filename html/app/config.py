@@ -12,7 +12,7 @@ class Config(object):
     """Static settings"""
 
     # Backend adress
-    backend = 'https://ws.spraakbanken.gu.se/ws/sparv/v1'
+    backend = 'https://ws.spraakbanken.gu.se/ws/sparv/v2'
 
     # Path to pipeline (not necessary, only used within this script)
     pipeline_dir = os.path.join(str(Path(__file__).parents[2]), 'data', 'pipeline')

@@ -116,13 +116,14 @@ def cleanup(timeout=604800, remove_errors=False):
         builds = app.config["BUILDS"]
         to_remove = []
         for h, b in builds.items():
+            # log.info("accessed_time %s, hash %s" % (time.time() - b.accessed_time, h))
             if (finished(b.status) and time.time() - b.accessed_time > timeout or
                     b.status == Status.Error and remove_errors):
-                log.info("Removing %s" % h)
-                b.remove_files()
-                to_remove.append(h)
+                to_remove.append((h, b))
         res = []
-        for h in to_remove:
+        for h, b in to_remove:
+            log.info("Removing %s" % h)
+            b.remove_files()
             del builds[h]
             res.append("<removed hash='%s'/>" % h)
         if len(res) == 0:
