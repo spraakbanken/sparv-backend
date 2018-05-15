@@ -39,8 +39,67 @@ def hello_world():
 
 @app.route('/api')
 def api():
-    """Return description of API."""
-    return render_template("api.html")
+    """Render API documentation."""
+    # return render_template("api.html")
+    import markdown
+
+    log.debug('index page')
+
+    SB_API_URL = "https://ws.spraakbanken.gu.se/ws/sparv/v2/"
+    VERSION = "2"
+    STYLES_CSS = "static/api.css"
+    LOGO = "static/sparv_light.png"
+    ICON = "static/sparv.png"
+
+    # doc_dir = os.path.join(configM.setupconfig['ABSOLUTE_PATH'], 'html')
+    doc_dir = "templates"
+    doc_file = 'api.md'
+
+    with app.open_resource(os.path.join(doc_dir, doc_file)) as doc:
+        md_text = doc.read()
+        log.debug("md_text: %s", type(md_text))
+        md_text = md_text.decode("UTF-8")
+        log.debug("md_text: %s", type(md_text))
+
+    # Replace placeholders
+    # md_text = md_text.replace("[URL]", request.base_url)
+    md_text = md_text.replace("[SBURL]", SB_API_URL)
+    md_text = md_text.replace("[VERSION]", VERSION)
+
+    # Convert Markdown to HTML
+    md = markdown.Markdown(extensions=["markdown.extensions.toc",
+                                       "markdown.extensions.smarty",
+                                       "markdown.extensions.def_list",
+                                       "markdown.extensions.tables",
+                                       "markdown.extensions.fenced_code"])
+    md_html = md.convert(md_text)
+
+    html = ["""<!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Sparv API v%s</title>
+            <link rel="shortcut icon" type="image/x-icon" href="%s"/>
+            <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css"
+              rel="stylesheet">
+            <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+            <script>hljs.initHighlightingOnLoad();</script>
+            <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+            <link href="%s" rel="stylesheet">
+          </head>
+          <body>
+            <div class="toc-wrapper">
+              <div class="header">
+                <img src="%s"><br><br>
+                Sparv API <span>v%s</span>
+              </div>
+              %s
+            </div>
+           <div class="content">
+            """ % (VERSION, ICON, STYLES_CSS, LOGO, VERSION, md.toc), md_html, "</div></body></html>"]
+
+    return "\n".join(html)
 
 
 @app.route('/status')
