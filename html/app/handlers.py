@@ -40,7 +40,6 @@ def hello_world():
 @app.route('/api')
 def api():
     """Render API documentation."""
-    # return render_template("api.html")
     import markdown
 
     log.debug('index page')
@@ -362,3 +361,7 @@ def download():
 
     return send_from_directory(filepath, filename, mimetype=mimetype,
                                as_attachment=True, attachment_filename=attachment_filename)
+
+@app.route('/easteregg')
+def easteregg():
+    return render_template("easteregg.html")

@@ -80,7 +80,7 @@ The default analysis language is Swedish but Sparv
 also supports other languages. The language is specified by supplying
 a two-letter language code to the `language` parameter.
 
-This is an example of an analysis of a German sentence:
+This is an example for an analysis of a German sentence:
 
 [`[SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de`]([SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de)
 
