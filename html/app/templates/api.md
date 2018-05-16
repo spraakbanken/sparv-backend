@@ -80,6 +80,10 @@ The default analysis language is Swedish but Sparv
 also supports other languages. The language is specified by supplying
 a two-letter language code to the `language` parameter.
 
+This is an example of an analysis of a German sentence:
+
+[`[SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de`]([SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de)
+
 The following table shows the languages that are currently supported and the tools
 that are used to analyse them:
 
@@ -104,10 +108,6 @@ Russian       |ru        |FreeLing
 Slovak        |sk        |TreeTagger
 Slovenian     |sl        |FreeLing
 Spanish       |es        |FreeLing
-
-This is an example of an analysis of a German sentence:
-
-[`[SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de`]([SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de)
 
 Different kinds of settings are supported for different languages, depending on which tool
 is used for the analysis. Please use the [frontend](https://spraakbanken.gu.se/sparv)
