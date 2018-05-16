@@ -107,7 +107,7 @@ Spanish       |es        |FreeLing
 
 This is an example of an analysis of a German sentence:
 
-[`[SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&settings={"lang":"de"}`]([SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&settings={"lang":"de"})
+[`[SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de`]([SBURL]?text=Nun+folgt+ein+deutscher+Beispielsatz.&language=de)
 
 Different kinds of settings are supported for different languages, depending on which tool
 is used for the analysis. Please use the [frontend](https://spraakbanken.gu.se/sparv)
@@ -123,7 +123,7 @@ By adding the flag `incremental=true` to your usual query you can
 receive more information on how your analysis is being processed.
 An example query could look like this:
 
-[`[SBURL]?text=Nu+med+inkrementell+information&incremental=true`]([SBURL]?text=Nu+med+inkrementell+information&incremental=true)
+`[SBURL]?text=Nu+med+inkrementell+information&incremental=true`
 
 
 The resulting XML will contain the following extra tags:
@@ -159,6 +159,8 @@ The resulting XML will contain the following extra tags:
 <increment command="" step="27" steps="27"/>
 ```
 
+Note that this information will only be displayed if your query is run for the first time.
+The progress information is not available for older builds.
 
 # Available calls
 
@@ -225,7 +227,7 @@ Pings the backend, responds with the status of the catapult.
 * **result:**
 
 ```.xml
-<catapult time="4.5924">PONG</catapult>
+<catapult time="0.0063">PONG</catapult>
 ```
 
 ## schema
