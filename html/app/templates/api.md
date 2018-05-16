@@ -77,8 +77,8 @@ result of the annotation. See [join](#join) for more details.
 # Analysing other Languages
 
 The default analysis language is Swedish but Sparv
-also supports other languages. The language is specified through
-the `lang` attribute in the `settings` variable.
+also supports other languages. The language is specified by supplying
+a two-letter language code to the `language` parameter.
 
 The following table shows the languages that are currently supported and the tools
 that are used to analyse them:
