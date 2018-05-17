@@ -4,10 +4,14 @@
 # svn checkout https://svn.spraakdata.gu.se/repos/sparv/backend/ .
 set -x
 
+echo "Create config.py"
+cp app/config_default.py app/config.py
+
 echo "Creating venv for backend"
-cd "html/app"
+cd "app"
 python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 deactivate
 cp activate_this.py venv/bin/activate_this.py
@@ -38,7 +42,7 @@ deactivate
 
 
 # Run backend with:
-# PATH_TO_BACKEND/html/app/venv/bin/gunicorn --chdir PATH_TO_BACKEND/html/app -c PATH_TO_BACKEND/html/app/gunicorn_config.py index
+# PATH_TO_BACKEND/app/venv/bin/gunicorn --chdir PATH_TO_BACKEND/app -c PATH_TO_BACKEND/app/gunicorn_config.py index
 
 # Setup cronjob:
 # MAILTO=""

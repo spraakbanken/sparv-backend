@@ -12,20 +12,20 @@ class Config(object):
     """Static settings"""
 
     # Backend adress
-    backend = 'https://ws.spraakbanken.gu.se/ws/sparv/v2'
+    backend = 'localhost:8801'
 
     # Path to pipeline (not necessary, only used within this script)
-    pipeline_dir = os.path.join(str(Path(__file__).parents[2]), 'data', 'pipeline')
+    pipeline_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'pipeline')
 
     # Pythonpaths to the sb python directory, and to the the directory of this script:
     sparv_python = os.path.join(pipeline_dir, 'python')
     sparv_backend = os.path.dirname(__file__)
 
     # Where the pipeline working directory is located
-    builds_dir = os.path.join(str(Path(__file__).parents[2]), 'data', 'builds')
+    builds_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'builds')
 
     # The log file location. Set this to None if you rather want to log to stdout
-    log_dir = os.path.join(str(Path(__file__).parents[2]), 'logs')
+    log_dir = os.path.join(str(Path(__file__).parents[1]), 'logs')
 
     # Where the models and makefiles are hosted (SPARV_MODELS, SPARV_MAKEFILES)
     sparv_models = os.path.join(pipeline_dir, 'models')
