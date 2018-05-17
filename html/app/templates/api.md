@@ -3,6 +3,8 @@ Sparv is [Språkbanken's](https://spraakbanken.gu.se/eng) annotation tool and
 contains a corpus import pipeline and a web service including a web interface.
 Sparv's API is available at [`[SBURL]`]([SBURL]).
 
+This documentation is for API version [VERSION].
+
 
 # Queries for Annotating Texts
 Queries to the web service can be sent as a simple GET request:
