@@ -89,7 +89,6 @@ def mk_file_attr(tag, attr):
 
 
 def add_attribute(tag, attr, xml_cols, structs, columns, structural=False, filename=None, add_xml=True):
-    log.warning("%s %s %s" % (tag, attr, structs))
     filename = filename or tag
     xml_attr = mk_xml_attr(tag, attr)
     file_attr = mk_file_attr(filename, attr)
