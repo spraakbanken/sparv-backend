@@ -177,10 +177,10 @@ When provided with the text parameter this call handles text input and runs the 
 
 * **methods:** `GET`, `POST`
 * **parameters:**
-    * `text`
+    * `text` (required)
     * `settings`, default: settings returned from `[SBURL]schema`
     * `language`, default: `sv`
-    * `mode`, default: `plain`
+    * `mode`, default: `plain`, options: `plain`, `xml`, `file`
     * `incremental`, default: `False`
 * **examples:**
     * [`[SBURL]?text=En+exempelmening+till+nättjänsten`]([SBURL]?text=En+exempelmening+till+nättjänsten)
@@ -238,7 +238,7 @@ Returns the json schema generated from the provided parameters.
 * **methods:** `GET`
 * **parameters:**
     * `language`, default: `sv`
-    * `mode`, default: `plain`
+    * `mode`, default: `plain`, other options: `xml`, `file`
 * **example:** [`[SBURL]schema?language=sv&mode=plain`]([SBURL]schema?language=sv&mode=plain)
 * **result:** json schema for the given language and text mode
 
@@ -249,7 +249,7 @@ Returns the Makefile generated from the provided parameters.
 * **methods:** `GET`, `POST`
 * **parameters:**
     * `language`, default: `sv`
-    * `mode`, default: `plain`
+    * `mode`, default: `plain`, other options: `xml`, `file`
     * `settings`
     * `incremental`, default: `False`
 * **examples:**             
@@ -289,7 +289,7 @@ Handles file uploads and runs the analysis.
 * **methods:** `POST`
 * **parameters:**
     * `language`, default: `sv`
-    * `mode`, default: `plain`
+    * `mode`, default: `plain`, other options: `xml`, `file`
     * `email`
     * `files`
     * `settings`
@@ -301,7 +301,7 @@ Handles download of result files.
 
 * **methods:** `GET`
 * **parameters:**
-    * hash
+    * `hash` (required)
 * **example:** `[SBURL]download?hash=a0c3861b251a595c83859c6cf4c595e8c71ad8da-f`
 * **result:** a zip file containing the annotation
 
@@ -310,9 +310,9 @@ Joins an existing build.
 
 * **methods:** `GET`, `POST`
 * **parameters:**
+    * `hashnumber` (required)
     * `language`, default: `sv`
-    * `mode`, default: `plain`
-    * `hashnumber`
+    * `mode`, default: `plain`, other options: `xml`, `file`
     * `incremental`, default: `False`
 * **examples:**
     * [`[SBURL]join?hash=57fce7e430c7ab4dd83d5244b566dade92595db2`]([SBURL]join?hash=57fce7e430c7ab4dd83d5244b566dade92595db2)
@@ -391,7 +391,7 @@ timeout (7 days). Requires `secret_key` parameter in query.
 
 * **methods:** `GET`
 * **parameters:**
-    * `secret_key`
+    * `secret_key` (required)
 * **example:** `[SBURL]cleanup?secret_key=supersekretkey`
 * **result:**
 
@@ -417,7 +417,7 @@ the builds with status Error. Requires `secret_key` parameter in query.
 
 * **methods:** `GET`
 * **parameters:**
-    * `secret_key`
+    * `secret_key` (required)
 * **example:** `[SBURL]cleanup/errors?secret_key=supersekretkey`
 * **result:**
 
@@ -440,7 +440,7 @@ Removes all the existing builds. Requires `secret_key` parameter in query.
 
 * **methods:** `GET`
 * **parameters:**
-    * `secret_key`
+    * `secret_key` (required)
 * **example:** `[SBURL]cleanup/forceall?secret_key=supersekretkey`
 * **result:**
 
