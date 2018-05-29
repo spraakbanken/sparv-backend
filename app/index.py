@@ -80,4 +80,4 @@ if __name__ == "__main__":
     waitress does not support continuous response streaming.
     """
     from waitress import serve
-    serve(application, host='0.0.0.0', port=58444)
+    serve(application, host='0.0.0.0', port=8080)
