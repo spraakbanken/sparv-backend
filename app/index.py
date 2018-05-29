@@ -1,5 +1,5 @@
 # -*- mode: python; coding: utf-8 -*-
-from past.builtins import execfile
+# from past.builtins import execfile
 import sys
 import os
 import logging
@@ -31,9 +31,9 @@ import logger  # import needed for logging to log file!
 log = logging.getLogger('pipeline')
 log.info("Restarted index.wsgi")
 
-# Activate virtual environment
-activate_this = os.path.join(THIS_DIR, Config.venv_path)
-execfile(activate_this, dict(__file__=activate_this))
+# # Activate virtual environment
+# activate_this = os.path.join(THIS_DIR, Config.venv_path)
+# execfile(activate_this, dict(__file__=activate_this))
 
 # Load ongoing and finished builds
 try:
