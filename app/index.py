@@ -8,6 +8,12 @@ THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 if THIS_DIR not in sys.path:
     sys.path.append(THIS_DIR)
 
+from importlib import util as importutil
+if importutil.find_spec("config") is None:
+    # print "copy config_default.py to config.py and add your settings"
+    from shutil import copyfile
+    copyfile(os.path.join(THIS_DIR, "config_default.py"), os.path.join(THIS_DIR, "config.py"))
+
 from config import Config
 from utils import mkdir, make_trace
 
