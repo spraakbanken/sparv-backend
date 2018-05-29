@@ -4,18 +4,11 @@ import sys
 import os
 import logging
 
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-if THIS_DIR not in sys.path:
-    sys.path.append(THIS_DIR)
-
-from importlib import util as importutil
-if importutil.find_spec("config") is None:
-    # print "copy config_default.py to config.py and add your settings"
-    from shutil import copyfile
-    copyfile(os.path.join(THIS_DIR, "config_default.py"), os.path.join(THIS_DIR, "config.py"))
-
-from config import Config
 from utils import mkdir, make_trace
+try:
+    from config import Config
+except ImportError:
+    from config_default import Config
 
 # Pythonpaths to the sb python directory, and to the the directory of this script.
 paths = [Config.sparv_python, Config.sparv_backend]
@@ -36,10 +29,6 @@ if __name__ == "__main__":
 import logger  # import needed for logging to log file!
 log = logging.getLogger('pipeline')
 log.info("Restarted index.wsgi")
-
-# # Activate virtual environment
-# activate_this = os.path.join(THIS_DIR, Config.venv_path)
-# execfile(activate_this, dict(__file__=activate_this))
 
 # Load ongoing and finished builds
 try:

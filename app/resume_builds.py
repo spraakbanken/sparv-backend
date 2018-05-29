@@ -5,9 +5,12 @@
 from threading import Thread
 import logging
 
-from config import Config
 from build import Build
 from utils import get_build_directories
+try:
+    from config import Config
+except ImportError:
+    from config_default import Config
 
 log = logging.getLogger('pipeline.' + __name__)
 

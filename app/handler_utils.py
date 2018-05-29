@@ -8,12 +8,15 @@ from werkzeug.utils import secure_filename
 from flask import Response, request, json
 import logging
 
-from config import Config
 from build import Build
 from enums import Status, Message, finished
 from schema_utils import validate_json
 from schema_generator import make_schema
 from utils import pretty_epoch_time, ERROR_MSG, make_trace
+try:
+    from config import Config
+except ImportError:
+    from config_default import Config
 
 log = logging.getLogger('pipeline.' + __name__)
 

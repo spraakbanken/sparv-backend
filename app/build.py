@@ -14,7 +14,10 @@ import zipfile
 import io
 import re
 
-from config import Config
+try:
+    from config import Config
+except ImportError:
+    from config_default import Config
 from enums import Status, Message, finished
 from make_makefile import makefile
 from utils import make_hash, make, mkdir, rmdir, ERROR_MSG, make_trace, UTF8

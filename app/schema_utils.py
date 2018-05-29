@@ -19,7 +19,6 @@ class DefaultValidator(Draft3Validator):
 def open_json(schema_file):
     """
     Open JSON Schema settings.
-    Location of these files is set in config.py.
     """
     try:
         with open(schema_file, "r") as f:

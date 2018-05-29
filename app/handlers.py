@@ -9,12 +9,15 @@ import logging
 import time
 import os
 
-from config import Config
 from make_makefile import makefile
 from schema_generator import make_schema
 from utils import pretty_epoch_time, get_build_directories, rmdir, ERROR_MSG, make_trace, UTF8
 from handler_utils import build, upload_procedure, get_settings, join_from_hash, check_secret_key
 from enums import Status, finished
+try:
+    from config import Config
+except ImportError:
+    from config_default import Config
 
 app = Flask(__name__)
 CORS(app)  # enables CORS support on all routes

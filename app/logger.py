@@ -3,7 +3,10 @@ import sys
 import os.path
 import time
 import stat
-from config import Config
+try:
+    from config import Config
+except ImportError:
+    from config_default import Config
 
 # Set debug level: DEBUG, INFO, WARNING, ERROR, CRITICAL
 DEBUGLEVEL = logging.INFO
@@ -22,9 +25,9 @@ if getattr(Config, "log_dir", False):
             f.write("%s CREATED DEBUG FILE\n\n" % now)
             # Fix permissions
             os.chmod(DEBUGFILE, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-            stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
+                     stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
             logging.basicConfig(filename=DEBUGFILE, level=DEBUGLEVEL,
-            format=LOGFMT, datefmt=DATEFMT)
+                                format=LOGFMT, datefmt=DATEFMT)
 else:
     logging.basicConfig(stream=sys.stdout, level=DEBUGLEVEL,
                         format=LOGFMT, datefmt=DATEFMT)
