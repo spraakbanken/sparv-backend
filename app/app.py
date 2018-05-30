@@ -1,5 +1,4 @@
 # -*- mode: python; coding: utf-8 -*-
-# from past.builtins import execfile
 import sys
 import os
 import logging
@@ -38,6 +37,7 @@ if not getattr(Config, "venv_path", False):
     from shutil import copyfile
     activate_this_script = os.path.join(THIS_DIR, Config.venv_path, "bin", "activate_this.py")
     copyfile(os.path.join(THIS_DIR, "activate_this.py"), activate_this_script)
+    from past.builtins import execfile
     execfile(activate_this_script, dict(__file__=activate_this_script))
 
 # Load ongoing and finished builds
