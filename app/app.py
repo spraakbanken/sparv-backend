@@ -30,6 +30,16 @@ import logger  # import needed for logging to log file!
 log = logging.getLogger('pipeline')
 log.info("Restarted index.wsgi")
 
+# Activate virtual environment if venv_path is supplied
+if not getattr(Config, "venv_path", False):
+    THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+    if THIS_DIR not in sys.path:
+        sys.path.append(THIS_DIR)
+    from shutil import copyfile
+    activate_this_script = os.path.join(THIS_DIR, Config.venv_path, "bin", "activate_this.py")
+    copyfile(os.path.join(THIS_DIR, "activate_this.py"), activate_this_script)
+    execfile(activate_this_script, dict(__file__=activate_this_script))
+
 # Load ongoing and finished builds
 try:
     from resume_builds import resume_builds

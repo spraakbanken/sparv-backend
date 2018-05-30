@@ -12,17 +12,20 @@ class Config(object):
     """Static settings"""
 
     # Backend adress
-    backend = 'localhost:8801'
+    backend = 'localhost:8000'
 
     # Path to pipeline (not necessary, only used within this script)
     pipeline_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'pipeline')
 
     # Pythonpaths to the sb python directory, and to the the directory of this script:
-    sparv_python = os.path.join(pipeline_dir, 'python')
+    sparv_python = pipeline_dir
     sparv_backend = os.path.dirname(__file__)
 
     # Where the pipeline working directory is located
     builds_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'builds')
+
+    # Is the application run with Docker?
+    run_docker = False
 
     # The log file location. Set this to None if you rather want to log to stdout
     log_dir = os.path.join(str(Path(__file__).parents[1]), 'logs')
@@ -35,7 +38,8 @@ class Config(object):
     secret_key = ""
 
     # Path to python virtual environment
-    venv_path = os.path.join(sparv_backend, 'venv', 'bin', 'activate_this.py')
+    # (optional, not needed when running with Docker or when venv is activated manually)
+    # venv_path = os.path.join(str(Path(__file__).parents[1]), 'venv')
 
     # The number of processes (sent as a -j flag to make)
     processes = 2
