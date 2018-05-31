@@ -15,7 +15,7 @@ for path in paths:
     if path not in sys.path:
         sys.path.append(path)
 
-os.environ['PYTHONPATH'] = ":".join([s for s in sys.path if s])
+# os.environ['PYTHONPATH'] = ":".join([s for s in sys.path if s])
 
 # Create builds directory
 if not os.path.exists(Config.builds_dir):
@@ -30,7 +30,7 @@ log = logging.getLogger('pipeline')
 log.info("Restarted index.wsgi")
 
 # Activate virtual environment if venv_path is supplied
-if not getattr(Config, "venv_path", False):
+if getattr(Config, "venv_path", False):
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
     if THIS_DIR not in sys.path:
         sys.path.append(THIS_DIR)
