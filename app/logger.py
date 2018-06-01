@@ -8,8 +8,7 @@ try:
 except ImportError:
     from config_default import Config
 
-# Set debug level: DEBUG, INFO, WARNING, ERROR, CRITICAL
-DEBUGLEVEL = logging.INFO
+DEBUGLEVEL = Config.debuglevel
 
 # Format for log messages and date
 LOGFMT = '%(asctime)-15s - %(levelname)s: %(message)s'

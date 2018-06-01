@@ -6,6 +6,7 @@
 from builtins import object
 import os
 from pathlib import Path
+import logging
 
 
 class Config(object):
@@ -24,11 +25,10 @@ class Config(object):
     # Where the pipeline working directory is located
     builds_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'builds')
 
-    # Is the application run with Docker?
-    run_docker = False
-
     # The log file location. Set this to None if you rather want to log to stdout
     log_dir = os.path.join(str(Path(__file__).parents[1]), 'logs')
+    # Set debug level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+    debuglevel = logging.INFO
 
     # Where the models and makefiles are hosted (SPARV_MODELS, SPARV_MAKEFILES)
     sparv_models = os.path.join(pipeline_dir, 'models')
@@ -39,7 +39,7 @@ class Config(object):
 
     # Path to python virtual environment
     # (optional, not needed when running with Docker or when venv is activated manually)
-    # venv_path = os.path.join(str(Path(__file__).parents[1]), 'venv')
+    # venv_path = os.path.join(os.path.dirname(__file__), 'venv')
 
     # The number of processes (sent as a -j flag to make)
     processes = 2
@@ -55,3 +55,11 @@ class Config(object):
 
     # The "python" interpreter, replaced with catalaunch
     python_interpreter = catalaunch_binary + " " + socket_file
+
+    ############################################################################
+    # Gunicorn config
+    gunicorn_errorlog = os.path.join(log_dir, "gunicorn.log")  # gunicorn log file. Remove for logging to console
+    gunicorn_timeout = 200           # workers silent for more than this many seconds are killed and restarted
+    gunicorn_bind = '0.0.0.0:8000'   # the socket to bind
+    gunicorn_workers = 1             # number of worker process for handling requests
+    ############################################################################
