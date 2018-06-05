@@ -22,11 +22,11 @@ if getattr(Config, "log_dir", False):
         with open(DEBUGFILE, "w") as f:
             now = time.strftime("%Y-%m-%d %H:%M:%S")
             f.write("%s CREATED DEBUG FILE\n\n" % now)
-            # Fix permissions
-            os.chmod(DEBUGFILE, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-                     stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
-            logging.basicConfig(filename=DEBUGFILE, level=DEBUGLEVEL,
-                                format=LOGFMT, datefmt=DATEFMT)
+    # Fix permissions
+    os.chmod(DEBUGFILE, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
+             stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
+    logging.basicConfig(filename=DEBUGFILE, level=DEBUGLEVEL,
+                        format=LOGFMT, datefmt=DATEFMT)
 else:
     logging.basicConfig(stream=sys.stdout, level=DEBUGLEVEL,
                         format=LOGFMT, datefmt=DATEFMT)
