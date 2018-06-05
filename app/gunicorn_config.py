@@ -12,5 +12,5 @@ except ImportError:
 
 errorlog = Config.gunicorn_errorlog
 timeout = Config.gunicorn_timeout
-bind = Config.gunicorn_bind
+bind = Config.wsgi_host + ":" + str(Config.wsgi_port)
 workers = Config.gunicorn_workers

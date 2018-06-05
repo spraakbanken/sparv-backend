@@ -14,6 +14,8 @@ class Config(object):
 
     # Backend adress
     backend = 'localhost:8000'
+    wsgi_host = '0.0.0.0'
+    wsgi_port = 8801
 
     # Path to pipeline (not necessary, only used within this script)
     pipeline_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'pipeline')
@@ -59,7 +61,6 @@ class Config(object):
     ############################################################################
     # Gunicorn config
     gunicorn_errorlog = os.path.join(log_dir, "gunicorn.log")  # gunicorn log file. Remove for logging to console
-    gunicorn_timeout = 200           # workers silent for more than this many seconds are killed and restarted
-    gunicorn_bind = '0.0.0.0:8000'   # the socket to bind
-    gunicorn_workers = 1             # number of worker process for handling requests
+    gunicorn_timeout = 200                            # workers silent for more than this many seconds are killed and restarted
+    gunicorn_workers = 1                              # number of worker process for handling requests
     ############################################################################
