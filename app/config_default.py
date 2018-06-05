@@ -61,6 +61,6 @@ class Config(object):
     ############################################################################
     # Gunicorn config
     gunicorn_errorlog = os.path.join(log_dir, "gunicorn.log")  # gunicorn log file. Remove for logging to console
-    gunicorn_timeout = 200                            # workers silent for more than this many seconds are killed and restarted
-    gunicorn_workers = 1                              # number of worker process for handling requests
+    gunicorn_timeout = 200  # workers silent for more than this many seconds are killed and restarted
+    gunicorn_workers = 1    # number of worker process for handling requests
     ############################################################################

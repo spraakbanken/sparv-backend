@@ -3,42 +3,27 @@ import sys
 import os
 import logging
 
-from utils import mkdir, make_trace
 try:
     from config import Config
 except ImportError:
     from config_default import Config
 
-# Pythonpaths to the sb python directory, and to the the directory of this script.
+# Pythonpaths to the sparv python directory, and to the the directory of this script
 paths = [Config.sparv_python, Config.sparv_backend]
 for path in paths:
     if path not in sys.path:
         sys.path.append(path)
 
-# os.environ['PYTHONPATH'] = ":".join([s for s in sys.path if s])
+from utils import mkdir, make_trace
 
 # Create builds directory
 if not os.path.exists(Config.builds_dir):
     mkdir(Config.builds_dir)
 
 # Setup logging
-if __name__ == "__main__":
-    # Log to stdout if this script is run locally
-    Config.log_dir = None
 import logger  # import needed for logging to log file!
 log = logging.getLogger('pipeline')
 log.info("Restarted index.wsgi")
-
-# Activate virtual environment if venv_path is supplied
-if getattr(Config, "venv_path", False):
-    THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-    # if THIS_DIR not in sys.path:
-    #     sys.path.append(THIS_DIR)
-    from shutil import copyfile
-    activate_this_script = os.path.join(THIS_DIR, Config.venv_path, "bin", "activate_this.py")
-    copyfile(os.path.join(THIS_DIR, "activate_this.py"), activate_this_script)
-    from past.builtins import execfile
-    execfile(activate_this_script, dict(__file__=activate_this_script))
 
 # Load ongoing and finished builds
 try:
@@ -56,17 +41,17 @@ def application(env, resp):
     All routes are specified in handlers.py
     """
     try:
-        from handlers import app as real_app
-        env['SCRIPT_NAME'] = ''
+        from handlers import app
+        # env['SCRIPT_NAME'] = ''
 
         # Save builds in app
-        real_app.config["BUILDS"] = builds
+        app.config["BUILDS"] = builds
 
         # Set global request counter
-        if "N_REQUESTS" not in real_app.config:
-            real_app.config["N_REQUESTS"] = 0
+        if "N_REQUESTS" not in app.config:
+            app.config["N_REQUESTS"] = 0
 
-        return real_app(env, resp)
+        return app(env, resp)
 
     except:
         log.exception("Error while running application.")
@@ -75,8 +60,18 @@ def application(env, resp):
 
 if __name__ == "__main__":
     """
-    For local testing. Run with gunicorn otherwise since
-    waitress does not support continuous response streaming.
+    For local testing. Run with gunicorn otherwise to get
+    continuous response streaming.
     """
-    from waitress import serve
-    serve(application, host='0.0.0.0', port=8080)
+    # Serve with Waitress
+    # from waitress import serve
+    # serve(application, host=Config.wsgi_host, port=Config.wsgi_port)
+
+    # Serve directly with Flask
+    from handlers import app
+    # Save builds in app
+    app.config["BUILDS"] = builds
+    # Set global request counter
+    if "N_REQUESTS" not in app.config:
+        app.config["N_REQUESTS"] = 0
+    app.run(debug=True, threaded=True, host=Config.wsgi_host, port=Config.wsgi_port)
