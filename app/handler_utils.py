@@ -248,7 +248,7 @@ def send_crash_mail(adress, hashnumber, warnings):
 
 
 def upload_procedure(builds, settings, files, email):
-    """The file upload procedure. Called by wrapper 'upload()'."""
+    """The file upload procedure. Called by wrapper 'file_upload()'."""
 
     if not files:
         log.exception(ERROR_MSG["no_files"])

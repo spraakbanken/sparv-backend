@@ -179,7 +179,7 @@ def cleanup(timeout=604800, remove_errors=False):
         for h, b in builds.items():
             # log.info("accessed_time %s, hash %s" % (time.time() - b.accessed_time, h))
             if (finished(b.status) and time.time() - b.accessed_time > timeout or
-                    b.status == Status.Error and remove_errors):
+                    b.status in [Status.Error, Status.ParseError] and remove_errors):
                 to_remove.append((h, b))
         res = []
         for h, b in to_remove:

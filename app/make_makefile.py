@@ -26,6 +26,7 @@ COLUMNS = [('word', 'word'),
            ('blingbring', 'blingbring'),
            ('swefn', 'swefn'),
            ('sentiment', 'sentiment'),
+           ('sentimentclass', 'sentimentclass'),
            ('ref', 'ref'),
            ('dephead.ref', 'dephead'),
            ('deprel', 'deprel')]

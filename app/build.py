@@ -358,6 +358,7 @@ class Build(object):
 
     def zip_result(self):
         """Create a zip archive of all the result files in the export.original folder."""
+        log.info("Creating zip file...")
         assert(finished(self.status))
         if self.status == Status.Done:
             if os.listdir(self.export_dir):
@@ -365,10 +366,10 @@ class Build(object):
                 filelike = io.BytesIO()
                 with zipfile.ZipFile(filelike, 'w', compression=zipfile.ZIP_DEFLATED) as zipflike:
                     for root, _dirs, files in os.walk(self.export_dir):
-                            for xmlfile in files:
-                                newfilename = xmlfile[:-4] + "_annotated.xml"
-                                zipflike.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
-                                zipf.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
+                        for xmlfile in files:
+                            newfilename = xmlfile[:-4] + "_annotated.xml"
+                            zipflike.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
+                            zipf.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
                 return filelike
             else:
                 # används inte just nu

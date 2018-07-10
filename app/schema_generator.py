@@ -374,14 +374,14 @@ def positional_attributes(lang, analysis):
         compound_attrs = default_compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
         lexical_classes = ["blingbring", "swefn"]
-        sentiment = ["sentiment"]
+        sentiment = ["sentiment", "sentimentclass"]
     elif analysis in ["sv", "sv-1800"]:
         lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
         compound_attrs = ["complemgram", "compwf", "prefix", "suffix"]
         default_compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
         lexical_classes = None
-        sentiment = ["sentiment"]
+        sentiment = ["sentiment", "sentimentclass"]
     else:  # analysis in ["fl", "tt"]
         lexical_attrs = ["pos", "msd", "lemma"]
         compound_attrs = default_compound_attrs = None
