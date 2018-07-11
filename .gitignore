@@ -1,4 +1,6 @@
 venv
 app/__pycache__
 config.py
-
+data/*
+logs/*
+sparv-catapult
