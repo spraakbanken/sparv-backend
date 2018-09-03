@@ -47,6 +47,7 @@ def api():
 
     log.debug('index page')
 
+    # SB_API_URL = Config.backend + "/"
     SB_API_URL = "https://ws.spraakbanken.gu.se/ws/sparv/v2/"
     VERSION = "2"
     STYLES_CSS = "static/api.css"
@@ -364,6 +365,7 @@ def download():
 
     return send_from_directory(filepath, filename, mimetype=mimetype,
                                as_attachment=True, attachment_filename=attachment_filename)
+
 
 @app.route('/easteregg')
 def easteregg():

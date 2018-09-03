@@ -558,7 +558,8 @@ Swedish with xml input:
                 "deprel"
             ],
             "sentiment": [
-                "sentiment"
+                "sentiment",
+                "sentimentclass"
             ]
         },
         "named_entity_recognition": [],
@@ -674,7 +675,8 @@ Swedish development mode (Sparv labs):
                 "swefn"
             ],
             "sentiment": [
-                "sentiment"
+                "sentiment",
+                "sentimentclass"
             ]
         },
         "named_entity_recognition": [
