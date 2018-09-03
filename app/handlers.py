@@ -238,6 +238,31 @@ def cleanup_all():
     return Response(res, mimetype='application/xml')
 
 
+@app.route('/cleanup/forceone')
+def cleanup_one():
+    """Remove a single (problematic) build."""
+    builds = app.config["BUILDS"]
+    secret_key = request.values.get('secret_key', '')
+    hash = request.values.get('hash', '')
+
+    if check_secret_key(secret_key):
+        b = builds.get(hash, None)
+        if b:
+            log.info("Removing %s" % hash)
+            del builds[hash]
+            b.remove_files()
+            res = ("<message>\n<removed hash='%s'/>\n</message>" % hash)
+        else:
+            log.error("Hash not found, trying to remove files.")
+            res = "<error>Failed to remove build: hash not found, trying to remove files.</error>\n"
+            rmdir(os.path.join(Config.builds_dir, hash))
+    else:
+        log.error("No builds will be removed.")
+        res = "<error>Failed to remove all builds: secret key could not be confirmed.</error>\n"
+
+    return Response(res, mimetype='application/xml')
+
+
 @app.route('/makefile', methods=['GET', 'POST'])
 def get_makefile():
     """Handler for returning the makefile."""
