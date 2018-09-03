@@ -245,6 +245,10 @@ def cleanup_one():
     secret_key = request.values.get('secret_key', '')
     hash = request.values.get('hash', '')
 
+    if not hash:
+        res = "<error>Don't know what to remove. Please enter hash number in query!</error>\n"
+        return Response(res, mimetype='application/xml')
+
     if check_secret_key(secret_key):
         b = builds.get(hash, None)
         if b:
@@ -255,7 +259,11 @@ def cleanup_one():
         else:
             log.error("Hash not found, trying to remove files.")
             res = "<error>Failed to remove build: hash not found, trying to remove files.</error>\n"
-            rmdir(os.path.join(Config.builds_dir, hash))
+            if hash in get_build_directories(Config.builds_dir):
+                rmdir(os.path.join(Config.builds_dir, hash))
+                log.info("Files removed for hash %s" % hash)
+            else:
+                log.info("No files to be removed for hash %s" % hash)
     else:
         log.error("No builds will be removed.")
         res = "<error>Failed to remove all builds: secret key could not be confirmed.</error>\n"

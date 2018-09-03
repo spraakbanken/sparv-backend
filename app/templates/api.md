@@ -435,6 +435,22 @@ Or if there are no builds with status Error:
 <message>No hashes to be removed.</message>
 ```
 
+## cleanup/forceone
+Removes a single build. Requires `secret_key` and `hash` parameter in query.
+
+* **methods:** `GET`
+* **parameters:**
+    * `secret_key` (required)
+    * `hash` (required)
+* **example:** `[SBURL]cleanup/forceone?secret_key=supersekretkey&hash=1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805`
+* **result:**
+
+```.xml
+<message>
+    <removed hash="1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805"/>
+</message>
+```
+
 ## cleanup/forceall
 Removes all the existing builds. Requires `secret_key` parameter in query.
 
@@ -457,7 +473,6 @@ Or if there are no builds:
 ```.xml
 <message>No hashes to be removed.</message>
 ```
-
 
 # Example settings
 
