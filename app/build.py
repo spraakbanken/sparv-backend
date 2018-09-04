@@ -258,7 +258,7 @@ class Build(object):
                 if not os.path.exists(out_file):
                     send_warnings()
                     self.change_status(Status.ParseError)
-                    log.exception(ERROR_MSG["parsing_error"])
+                    log.error(ERROR_MSG["parsing_error"])
                     return
 
         else:
@@ -270,13 +270,13 @@ class Build(object):
                 send_warnings()
                 self.change_status(Status.Error)
                 self.stderr = stderr.rstrip().decode("UTF-8")
-                log.exception(ERROR_MSG["make_error"])
+                log.error(ERROR_MSG["make_error"])
                 return
             # Send warnings
             if not os.path.exists(self.textfile):
                 send_warnings()
                 self.change_status(Status.ParseError)
-                log.exception(ERROR_MSG["parsing_error"])
+                log.error(ERROR_MSG["parsing_error"])
                 return
 
             if fmt == 'vrt' or fmt == 'cwb':
@@ -397,7 +397,7 @@ class Build(object):
             if self.warnings:
                 out.append('<warning>' + escape(self.warnings) + '</warning>')
                 out.append("<error>%s</error>" % ERROR_MSG["parsing_error"])
-                log.exception(ERROR_MSG["parsing_error"])
+                log.error(ERROR_MSG["parsing_error"])
                 return "\n".join(out)
 
         # Result when Done
@@ -412,7 +412,7 @@ class Build(object):
                     if not os.path.exists(out_file):
                         self.change_status(Status.Error)
                         out.append("<error>%s</error>" % ERROR_MSG["missing_file"])
-                        log.exception(ERROR_MSG["missing_file"])
+                        log.error(ERROR_MSG["missing_file"])
                         return "\n".join(out)
 
                 result = "<corpus link='%s'/>\n" % download_link
