@@ -157,7 +157,9 @@ def schema():
     """The /schema handler"""
     lang = request.values.get('language', 'sv')
     mode = request.values.get('mode', 'plain')
-    return_json = make_schema(lang, mode)
+    order = request.values.get('order', 'True')
+    order = order.lower() == 'true'
+    return_json = make_schema(lang, mode, order)
     # print(json.dumps(return_json, indent=4, separators=(',', ': '), ensure_ascii=False))
     return Response(json.dumps(return_json),
                     mimetype="application/json",

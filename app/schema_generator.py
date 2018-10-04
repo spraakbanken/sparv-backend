@@ -9,7 +9,7 @@ import logging
 log = logging.getLogger('pipeline.' + __name__)
 
 
-def make_schema(lang, mode):
+def make_schema(lang, mode, order=True):
     """Build settings schema json."""
 
     # Get analysis mode from TOOL_DICT
@@ -39,8 +39,10 @@ def make_schema(lang, mode):
     # Remove entries with None values
     [i for i in remove_nones(schema)]
 
-    # Add list with object order to all OrderedDicts
-    [i for i in add_order(schema)]
+    if order:
+        # Add list with object order to all OrderedDicts
+        [i for i in add_order(schema)]
+
     return schema
 
 
