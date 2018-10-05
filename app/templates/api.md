@@ -205,22 +205,6 @@ When provided with the text parameter this call handles text input and runs the 
 </result>
 ```
 
-## status
-Returns the status of existing builds.
-
-* **methods:** `GET`
-* **example:** [`[SBURL]status`]([SBURL]status)
-* **result:**
-
-```.xml
-<status>
-  <build hash="d91d063efb5a8439643147c7367e3a4ddad5ec63" status="Done" since="2018-05-11 18:48:32" accessed="2018-05-11 18:29:57" accessed-secs-ago="326021.5"/>
-  <build hash="736e99a73b5c9fdc1d284397a8790df17afe3214-f" status="Done" since="2018-05-11 18:49:57" accessed="2018-05-11 15:38:19" accessed-secs-ago="336318.9"/>
-  <build hash="57fce7e430c7ab4dd83d5244b566dade92595db2" status="Done" since="2018-05-11 18:48:45" accessed="2018-05-15 11:47:15" accessed-secs-ago="4582.9"/>
-</status>
-```
-
-
 ## ping
 Pings the backend, responds with the status of the catapult.
 
@@ -383,6 +367,24 @@ Joins an existing build.
         </text>
       </corpus>
       </result>
+```
+
+## status
+Returns the status of existing builds.
+Requires `secret_key` parameter in query.
+
+* **methods:** `GET`
+* **parameters:**
+    * `secret_key` (required)
+* **example:** `[SBURL]status?secret_key=supersekretkey`
+* **result:**
+
+```.xml
+<status>
+  <build hash="d91d063efb5a8439643147c7367e3a4ddad5ec63" status="Done" since="2018-05-11 18:48:32" accessed="2018-05-11 18:29:57" accessed-secs-ago="326021.5"/>
+  <build hash="736e99a73b5c9fdc1d284397a8790df17afe3214-f" status="Done" since="2018-05-11 18:49:57" accessed="2018-05-11 15:38:19" accessed-secs-ago="336318.9"/>
+  <build hash="57fce7e430c7ab4dd83d5244b566dade92595db2" status="Done" since="2018-05-11 18:48:45" accessed="2018-05-15 11:47:15" accessed-secs-ago="4582.9"/>
+</status>
 ```
 
 ## cleanup
