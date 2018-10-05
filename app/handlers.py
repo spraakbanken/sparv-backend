@@ -110,18 +110,23 @@ def status():
     """
     The /status handler.
     Return the status of existing builds.
+    Requires secret_key parameter in query.
     """
-    builds = app.config["BUILDS"]
-    res = "<status>\n"
-    for h, b in builds.items():
-        if b.status is not None:
-            res += ("<build hash='%s' status='%s' since='%s' accessed='%s' accessed-secs-ago='%s'/>\n" %
-                    (h, Status.lookup[b.status],
-                     pretty_epoch_time(b.status_change_time),
-                     pretty_epoch_time(b.accessed_time),
-                     round(time.time() - b.accessed_time, 1)))
+    secret_key = request.values.get('secret_key', '')
+    if check_secret_key(secret_key):
+        builds = app.config["BUILDS"]
+        res = "<status>\n"
+        for h, b in builds.items():
+            if b.status is not None:
+                res += ("<build hash='%s' status='%s' since='%s' accessed='%s' accessed-secs-ago='%s'/>\n" %
+                        (h, Status.lookup[b.status],
+                         pretty_epoch_time(b.status_change_time),
+                         pretty_epoch_time(b.accessed_time),
+                         round(time.time() - b.accessed_time, 1)))
 
-    res += "</status>\n"
+        res += "</status>\n"
+    else:
+        res = "<error>Failed to show status: secret key could not be confirmed.</error>\n"
     return Response(res, mimetype='application/xml', content_type='application/xml; charset=utf-8')
 
 
