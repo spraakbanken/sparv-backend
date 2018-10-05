@@ -1,3 +1,6 @@
 [submodule "data/sparv-pipeline"]
 	path = data/sparv-pipeline
 	url = https://github.com/spraakbanken/sparv-pipeline.git
+[submodule "sparv-catapult"]
+	path = sparv-catapult
+	url = https://github.com/spraakbanken/sparv-catapult.git

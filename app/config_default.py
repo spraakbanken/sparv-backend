@@ -18,7 +18,7 @@ class Config(object):
     wsgi_port = 8801
 
     # Path to pipeline (not necessary, only used within this script)
-    pipeline_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'pipeline')
+    pipeline_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'sparv-pipeline')
 
     # Pythonpaths to the sb python directory, and to the the directory of this script:
     sparv_python = pipeline_dir
