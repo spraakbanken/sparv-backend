@@ -1,4 +1,4 @@
-# sparv-backend
+# Sparv Backend
 
 There are several options for running the Sparv backend:
 
@@ -6,12 +6,29 @@ There are several options for running the Sparv backend:
 2. with gunicorn
 3. with waitress (mostly for testing purposes)
 
+
+## Prerequisites
+
+* A Unix-like environment (e.g. Linux, OS X)
+* [Python 3.4](http://python.org/) or newer
+* [GNU Make](https://www.gnu.org/software/make/)
+
 ## Installation
+* Clone this project:
+   ```
+   git clone https://github.com/spraakbanken/sparv-backend.git
+   cd sparv-backend
+   ```
 
 * Create config.py and adapt variables:
     ```
     cp app/config_default.py app/config.py
     ```
+
+* Create directory for log files:
+   ```
+   mkdir logs
+   ```
 
 * Create python virtual environment for backend (not needed when using Docker)
     ```
@@ -24,9 +41,10 @@ There are several options for running the Sparv backend:
 
 ## Installation of additional components
 
-* Clone catapult repo and build catalaunch:
+* Setup catapult submodule and build catalaunch:
     ```
-    git clone https://github.com/spraakbanken/sparv-catapult.git
+    git submodule init
+    git submodule update
     make -C sparv-catapult
     ```
 
@@ -39,12 +57,15 @@ There are several options for running the Sparv backend:
     deactivate
     ```
 
+* Adapt the variables in `sparv-catapult/config.sh` if necessary.
+
 * Clone Sparv pipeline repo:
     ```
     mkdir -p "data/pipeline"
     git clone https://github.com/spraakbanken/sparv-pipeline.git data
     ```
-* Follow the Sparv pipeline installation instructions.
+* Follow the Sparv pipeline installation instructions. Use the catapult's venv
+  as virtual environment inside the sparv-pipeline!
 
 ## Running the Sparv backend
 
@@ -55,7 +76,7 @@ There are several options for running the Sparv backend:
 
     ```
     PATH_TO_BACKEND=`pwd`
-    $PATH_TO_BACKEND/app/venv/bin/gunicorn --chdir $PATH_TO_BACKEND/app -c $PATH_TO_BACKEND/app/gunicorn_config.py app
+    $PATH_TO_BACKEND/venv/bin/gunicorn --chdir $PATH_TO_BACKEND/app -c $PATH_TO_BACKEND/app/gunicorn_config.py app
     ```
 
 3. With waitress (run with python3):
