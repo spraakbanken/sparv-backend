@@ -9,7 +9,7 @@ import logging
 log = logging.getLogger('pipeline.' + __name__)
 
 
-def make_schema(lang, mode, order=True):
+def make_schema(lang, mode, minify=False):
     """Build settings schema json."""
 
     # Get analysis mode from TOOL_DICT
@@ -39,7 +39,12 @@ def make_schema(lang, mode, order=True):
     # Remove entries with None values
     [i for i in remove_nones(schema)]
 
-    if order:
+    if minify:
+        # Remove entries from json which are note valid
+        # according to https://tools.ietf.org/html/draft-wright-json-schema-validation-00
+        for k in ["title_sv", "description_sv", "class", "documentation"]:
+            [i for i in remove_key(k, schema)]
+    else:
         # Add list with object order to all OrderedDicts
         [i for i in add_order(schema)]
 
@@ -552,6 +557,23 @@ def remove_nones(json_input, parent_key=None):
             if item is None:
                 json_input.remove(item)
             for item_val in remove_nones(item, parent_key):
+                yield item_val
+
+
+def remove_key(key, json_input, parent_key=None):
+    """Recursively remove all instances of 'key'."""
+    if isinstance(json_input, dict):
+        for k, v in list(json_input.items()):
+            if k == key:
+                json_input.pop(k)
+            else:
+                for child_val in remove_key(key, v, k):
+                    yield child_val
+    elif isinstance(json_input, list):
+        for item in json_input:
+            if item == key:
+                json_input.remove(item)
+            for item_val in remove_key(key, item, parent_key):
                 yield item_val
 
 
