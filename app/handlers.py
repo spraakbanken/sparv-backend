@@ -8,6 +8,7 @@ from xml.sax.saxutils import escape
 import logging
 import time
 import os
+import yaml
 
 from make_makefile import makefile
 from schema_generator import make_schema
@@ -192,6 +193,28 @@ def api():
             """ % (VERSION, ICON, STYLES_CSS, LOGO, VERSION, md.toc), md_html, "</div></body></html>"]
 
     return "\n".join(html)
+
+
+@app.route('/apispec')
+def apispec():
+    """Serve API specification (JSON)."""
+
+    # SB_API_URL = Config.backend + "/"
+    SB_API_URL = "https://ws.spraakbanken.gu.se/ws/sparv/v2"
+    VERSION = "3.0"
+
+    # Open oas file
+    doc_dir = "templates"
+    doc_file = "sparv-oas-raw.yaml"
+    with app.open_resource(os.path.join(doc_dir, doc_file)) as doc:
+        yaml_doc = doc.read()
+        yaml_doc = yaml_doc.decode("UTF-8")
+
+    # Replace placeholders
+    yaml_doc = yaml_doc.replace("[SBURL]", SB_API_URL)
+    yaml_doc = yaml_doc.replace("[VERSION]", VERSION)
+    data = yaml.load(yaml_doc)
+    return jsonify(data), 200
 
 
 @app.route('/status')
