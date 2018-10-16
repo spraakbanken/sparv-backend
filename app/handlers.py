@@ -2,7 +2,7 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from flask import Flask, Response, request, json, render_template, send_from_directory
+from flask import Flask, Response, request, json, render_template, send_from_directory, jsonify
 from flask_cors import CORS
 from xml.sax.saxutils import escape
 import logging
@@ -12,7 +12,7 @@ import os
 from make_makefile import makefile
 from schema_generator import make_schema
 from utils import pretty_epoch_time, get_build_directories, rmdir, ERROR_MSG, make_trace, UTF8
-from handler_utils import build, upload_procedure, get_settings, join_from_hash, check_secret_key
+from handler_utils import build, upload_procedure, get_settings, join_from_hash, check_secret_key, jsonify_error
 from enums import Status, finished
 try:
     from config import Config
@@ -36,8 +36,9 @@ def my_method():
 
 @app.route('/hello')
 def hello_world():
-    log.info("hello!")
-    return Response("<response>Hello!</response>\n", mimetype='application/xml')
+    """For debugging purposes."""
+    log.info("Hello!")
+    return jsonify({'message': 'Hello!'}), 200
 
 
 @app.route('/api')
@@ -113,21 +114,27 @@ def status():
     Requires secret_key parameter in query.
     """
     secret_key = request.values.get('secret_key', '')
+    log.info("Show status")
     if check_secret_key(secret_key):
         builds = app.config["BUILDS"]
-        res = "<status>\n"
+        data = {"builds": []}
         for h, b in builds.items():
             if b.status is not None:
-                res += ("<build hash='%s' status='%s' since='%s' accessed='%s' accessed-secs-ago='%s'/>\n" %
-                        (h, Status.lookup[b.status],
-                         pretty_epoch_time(b.status_change_time),
-                         pretty_epoch_time(b.accessed_time),
-                         round(time.time() - b.accessed_time, 1)))
+                build = {
+                    "hash": h,
+                    "status": Status.lookup[b.status],
+                    "since": pretty_epoch_time(b.status_change_time),
+                    "accessed": pretty_epoch_time(b.accessed_time),
+                    "accessed-secs-ago": round(time.time() - b.accessed_time, 1)
 
-        res += "</status>\n"
+                }
+                data["builds"].append(build)
+        status = 200
     else:
-        res = "<error>Failed to show status: secret key could not be confirmed.</error>\n"
-    return Response(res, mimetype='application/xml', content_type='application/xml; charset=utf-8')
+        msg = "Failed to show status: secret key could not be confirmed."
+        data = jsonify_error(msg)
+        status = 401
+    return jsonify(data), status
 
 
 @app.route('/ping')
@@ -136,7 +143,6 @@ def ping():
     The /ping handler.
     Ping this script, respond with the status of the catapult.
     """
-    ping_error_msg = "<error>\n<catapult time='%s'>\n<stdout>%s</stdout>\n<stderr>%s</stderr>\n</catapult>\n</error>"
     try:
         t0 = time.time()
         from subprocess import Popen, PIPE
@@ -146,15 +152,23 @@ def ping():
         stderr = stderr.decode(UTF8)
         t1 = time.time()
     except BaseException as e:
-        xml = "<error>Failed to ping catapult: %s</error>\n" % e
-        return Response(xml, mimetype='application/xml')
+        msg = "Failed to ping catapult: %s" % e
+        data = jsonify_error(msg)
+        return jsonify(data), 500
     else:
         t = round(t1 - t0, 4)
         if not stderr and stdout == "PONG":
-            xml = "<catapult time='%s'>%s</catapult>\n" % (t, stdout)
+            data = {
+                "message": stdout,
+                "time": t
+            }
+            status = 200
         else:
-            xml = ping_error_msg % (t, stdout, stderr)
-        return Response(xml, mimetype='application/xml')
+            msg = "Something went wrong."
+            data = jsonify_error(msg, stdout=stdout, stderr=stderr,
+                                 catapult_time=t)
+            status = 500
+        return jsonify(data), status
 
 
 @app.route('/schema')
@@ -166,9 +180,7 @@ def schema():
     minify = minify.lower() == 'true'
     return_json = make_schema(lang, mode, minify)
     # print(json.dumps(return_json, indent=4, separators=(',', ': '), ensure_ascii=False))
-    return Response(json.dumps(return_json),
-                    mimetype="application/json",
-                    content_type='application/json; charset=utf-8')
+    return jsonify(return_json), 200
 
 
 @app.route('/cleanup')
@@ -189,21 +201,21 @@ def cleanup(timeout=604800, remove_errors=False):
             if (finished(b.status) and time.time() - b.accessed_time > timeout or
                     b.status in [Status.Error, Status.ParseError] and remove_errors):
                 to_remove.append((h, b))
-        res = []
+        data = {"removed_builds": []}
         for h, b in to_remove:
             log.info("Removing %s" % h)
             b.remove_files()
             del builds[h]
-            res.append("<removed hash='%s'/>" % h)
-        if len(res) == 0:
-            res = "<message>No hashes to be removed.</message>\n"
-        else:
-            res = "\n".join(res)
-            res = "<message>\n%s</message>\n" % res
+            data["removed_builds"].append("%s" % h)
+        if len(data["removed_builds"]) == 0:
+            data = {"message": "No hashes to be removed."}
+        status = 200
     else:
-        res = "<error>Failed to run cleanup: secret key could not be confirmed.</error>\n"
+        msg = "Failed to run cleanup: secret key could not be confirmed."
+        data = jsonify_error(msg)
+        status = 401
 
-    return Response(res, mimetype='application/xml')
+    return jsonify(data), status
 
 
 @app.route('/cleanup/errors')
@@ -229,20 +241,20 @@ def cleanup_all():
                 b.remove_files()
             else:
                 rmdir(os.path.join(Config.builds_dir, hashnumber))
-        res = []
+        data = {"removed_builds": []}
         for h in to_remove:
             del builds[h]
-            res.append("<removed hash='%s'/>" % h)
-        if len(res) == 0:
-            res = "<message>No hashes to be removed.</message>\n"
-        else:
-            res = "\n".join(res)
-            res = "<message>\n%s</message>\n" % res
+            data["removed_builds"].append("%s" % h)
+        if len(data["removed_builds"]) == 0:
+            data = {"message": "No hashes to be removed."}
+        status = 200
     else:
         log.error("No builds will be removed.")
-        res = "<error>Failed to remove all builds: secret key could not be confirmed.</error>\n"
+        msg = "Failed to run cleanup: secret key could not be confirmed."
+        data = jsonify_error(msg)
+        status = 401
 
-    return Response(res, mimetype='application/xml')
+    return jsonify(data), status
 
 
 @app.route('/cleanup/forceone')
@@ -253,8 +265,9 @@ def cleanup_one():
     hash = request.values.get('hash', '')
 
     if not hash:
-        res = "<error>Don't know what to remove. Please enter hash number in query!</error>\n"
-        return Response(res, mimetype='application/xml')
+        msg = "Don't know what to remove. Please enter hash number in query!"
+        data = jsonify_error(msg)
+        return jsonify(data), 400
 
     if check_secret_key(secret_key):
         b = builds.get(hash, None)
@@ -262,20 +275,24 @@ def cleanup_one():
             log.info("Removing %s" % hash)
             del builds[hash]
             b.remove_files()
-            res = ("<message>\n<removed hash='%s'/>\n</message>" % hash)
+            data = {"removed_builds": ["%s" % hash]}
         else:
-            log.error("Hash not found, trying to remove files.")
-            res = "<error>Failed to remove build: hash not found, trying to remove files.</error>\n"
+            msg = "Failed to remove build: hash not found, trying to remove files."
+            log.error(msg)
+            data = jsonify_error(msg)
+            status = 400
             if hash in get_build_directories(Config.builds_dir):
                 rmdir(os.path.join(Config.builds_dir, hash))
                 log.info("Files removed for hash %s" % hash)
             else:
                 log.info("No files to be removed for hash %s" % hash)
     else:
-        log.error("No builds will be removed.")
-        res = "<error>Failed to remove all builds: secret key could not be confirmed.</error>\n"
+        msg = "Failed to remove all builds: secret key could not be confirmed."
+        log.error(msg)
+        data = jsonify_error(msg)
+        status = 401
 
-    return Response(res, mimetype='application/xml')
+    return jsonify(data), status
 
 
 @app.route('/makefile', methods=['GET', 'POST'])
@@ -336,11 +353,10 @@ def join():
     """Handler for joining an existing build."""
     try:
         log.info("Joining existing build")
-        lang = request.values.get('language', 'sv')
-        mode = request.values.get('mode', 'plain')
         builds = app.config["BUILDS"]
-        _settings, incremental = get_settings(lang, mode)
         hashnumber = request.values.get('hash', '')
+        incremental = request.values.get('incremental', '')
+        incremental = incremental.lower() == 'true'
 
         def generate(builds, hashnumber, incremental):
             yield "<result>\n"
@@ -363,7 +379,7 @@ def file_upload():
         mode = request.values.get('mode', 'plain')
         email = request.values.get('email', '')
         builds = app.config['BUILDS']
-        settings, _incremental = get_settings(lang, mode)
+        settings, incremental = get_settings(lang, mode)
         uploaded_files = request.files.getlist("files[]")
 
         files = []
@@ -373,7 +389,7 @@ def file_upload():
             files.append((name, text))
 
         def generate(builds, settings, files, email):
-            for node in upload_procedure(builds, settings, files, email):
+            for node in upload_procedure(builds, settings, incremental, files, email):
                 yield node
 
         return Response(generate(builds, settings, files, email), mimetype='application/xml')

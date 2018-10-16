@@ -247,7 +247,7 @@ def send_crash_mail(adress, hashnumber, warnings):
     server.quit()
 
 
-def upload_procedure(builds, settings, files, email):
+def upload_procedure(builds, settings, incremental, files, email):
     """The file upload procedure. Called by wrapper 'file_upload()'."""
 
     if not files:
@@ -257,7 +257,7 @@ def upload_procedure(builds, settings, files, email):
 
     yield "<result>\n"
     log.info("Starting a new build with file upload procedure")
-    for node, current_build in build(builds, "", settings, True, "xml", files=files):
+    for node, current_build in build(builds, "", settings, incremental, "xml", files=files):
         yield node
 
     # create downloadable zip file
@@ -314,3 +314,14 @@ def check_secret_key(secret_key):
     else:
         log.error("Secret key was not supplied or incorrect.")
         return False
+
+
+def jsonify_error(msg, **kwargs):
+    data = {
+        "error": {
+            "message": msg,
+        }
+    }
+    for key in kwargs:
+        data["error"][key] = kwargs[key]
+    return data
