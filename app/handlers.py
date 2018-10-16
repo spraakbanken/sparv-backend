@@ -90,7 +90,7 @@ def schema():
     return jsonify(return_json), 200
 
 
-@app.route('/makefile', methods=['GET', 'POST'])
+@app.route('/makefile', methods=['GET'])
 def get_makefile():
     """Handler for returning the makefile."""
     try:
@@ -106,7 +106,7 @@ def get_makefile():
         return Response(res, mimetype='application/xml')
 
 
-@app.route('/join', methods=['GET', 'POST'])
+@app.route('/join', methods=['GET'])
 def join():
     """Handler for joining an existing build."""
     try:
@@ -257,8 +257,6 @@ def ping():
                                  catapult_time=t)
             status = 500
         return jsonify(data), status
-
-
 
 
 @app.route('/upload', methods=['GET', 'POST'])
