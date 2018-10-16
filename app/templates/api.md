@@ -277,6 +277,7 @@ Handles file uploads and runs the analysis.
     * `email`
     * `files`
     * `settings`
+    * `incremental`, default: `False`
 * **example:** `curl -X POST -F files[]=@/path/to/file/myfile.txt [SBURL]upload?`
 * **result:** a download link to a zip file containing the annotation
 
@@ -294,9 +295,7 @@ Joins an existing build.
 
 * **methods:** `GET`, `POST`
 * **parameters:**
-    * `hashnumber` (required)
-    * `language`, default: `sv`
-    * `mode`, default: `plain`, other options: `xml`, `file`
+    * `hash` (required)
     * `incremental`, default: `False`
 * **examples:**
     * [`[SBURL]join?hash=57fce7e430c7ab4dd83d5244b566dade92595db2`]([SBURL]join?hash=57fce7e430c7ab4dd83d5244b566dade92595db2)
