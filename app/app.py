@@ -51,6 +51,8 @@ def application(env, resp):
         if "N_REQUESTS" not in app.config:
             app.config["N_REQUESTS"] = 0
 
+        app.config["JSON_SORT_KEYS"] = False
+
         return app(env, resp)
 
     except:
@@ -74,4 +76,6 @@ if __name__ == "__main__":
     # Set global request counter
     if "N_REQUESTS" not in app.config:
         app.config["N_REQUESTS"] = 0
+
+    app.config["JSON_SORT_KEYS"] = False
     app.run(debug=True, threaded=True, host=Config.wsgi_host, port=Config.wsgi_port)

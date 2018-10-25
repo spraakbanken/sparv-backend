@@ -20,9 +20,9 @@ TOOL_DICT = {
     "sv": "sv",
     "sv-dev": "sv-dev",
     "sv-1800": "sv-1800",
-    "as": "fl",  # FreeLing
+    # "as": "fl",  # FreeLing
     "ca": "fl",  # FreeLing
-    "cy": "fl",  # FreeLing
+    # "cy": "fl",  # FreeLing
     "en": "fl",  # FreeLing
     "de": "fl",  # FreeLing
     "es": "fl",  # FreeLing
