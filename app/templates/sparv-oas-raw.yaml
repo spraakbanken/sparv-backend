@@ -9,6 +9,8 @@ info:
     [Strix](https://spraakbanken.gu.se/strix).
 
     You can read more about Sparv on [Språkbanken's web page](https://spraakbanken.gu.se/eng/research/infrastructure/sparv).
+  x-logo:
+    url: [SBURL]/static/sparv_frame.png
   contact:
     name: Språkbanken
     url: https://spraakbanken.gu.se/
@@ -83,7 +85,9 @@ tags:
       provides information on which languages are currently supported and which tools are used for their analysis.
   - name: General
   - name: Files
+    description: File upload and download.
   - name: Cleanup
+    description: Calls for removing builds.
 paths:
   /:
     get:
@@ -110,6 +114,16 @@ paths:
       responses:
         '200':
           description: Text analysis in XML
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisSchema'
+        '500':
+          description: Failed to run analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneralError"
     post:
       tags:
         - Analysis
@@ -136,7 +150,16 @@ paths:
       responses:
         '200':
           description: Text analysis in XML
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisSchema'
+        '500':
+          description: Failed to run analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneralError"
   /schema:
     get:
       tags:
@@ -164,7 +187,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /makefile:
     get:
@@ -188,13 +211,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/makefile"
+                $ref: "#/components/schemas/MakefileSchema"
         '500':
           description: Failed to return Makefile
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /join:
     get:
@@ -212,46 +235,17 @@ paths:
         - $ref: '#/components/parameters/HashParam'
       responses:
         '200':
-          description: The settings, input text, hash number and text analysis in XML
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: "#/components/schemas/??"
+          description: The settings, original input text and text analysis in XML
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JoinSchema"
         '500':
           description: Failed to join build
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
-
-  /api:
-    get:
-      tags:
-        - General
-      summary: API documentation
-      description: |
-        Shows an API documentation (HTML).
-
-        ### Example
-
-        [`/api`]([SBURL]/api)
-      responses:
-        '200':
-          description: Backend responds.
-  /apispec:
-    get:
-      tags:
-        - General
-      summary: API specification
-      description: |
-        Serves the API specification (JSON).
-
-        ### Example
-
-        [`/apispec`]([SBURL]/apispec)
-      responses:
-        '200':
-          description: Backend responds.
+                $ref: "#/components/schemas/GeneralError"
 
   /status:
     get:
@@ -267,19 +261,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/status"
+                $ref: "#/components/schemas/StatusSchema"
         '401':
           description: "Failed to show status: secret key could not be confirmed"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/authentication-error"
+                $ref: "#/components/schemas/AuthenticationError"
         '500':
           description: Failed to show status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /ping:
     get:
@@ -298,13 +292,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ping"
+                $ref: "#/components/schemas/PingSchema"
         '500':
           description: Failed to ping catapult
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /upload:
     post:
@@ -348,13 +342,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/file-result"
+                $ref: "#/components/schemas/FileSchema"
         '500':
           description: Analysis failed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /download:
     get:
@@ -377,7 +371,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /cleanup:
     get:
@@ -394,20 +388,20 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/cleanup'
-                  - $ref: '#/components/schemas/no-cleanup'
+                  - $ref: '#/components/schemas/Cleanup'
+                  - $ref: '#/components/schemas/NoCleanup'
         '500':
           description: Failed to remove builds
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
         '401':
           description: "Cleanup failed: secret key could not be confirmed"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/authentication-error"
+                $ref: "#/components/schemas/AuthenticationError"
 
   /cleanup/errors:
     get:
@@ -424,20 +418,20 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/cleanup'
-                  - $ref: '#/components/schemas/no-cleanup'
+                  - $ref: '#/components/schemas/Cleanup'
+                  - $ref: '#/components/schemas/NoCleanup'
         '500':
           description: Failed to remove builds
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
         '401':
           description: "Cleanup failed: secret key could not be confirmed"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/authentication-error"
+                $ref: "#/components/schemas/AuthenticationError"
 
   /cleanup/forceone:
     get:
@@ -455,25 +449,25 @@ paths:
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/cleanup-one'
+                  $ref: '#/components/schemas/CleanupOne'
         '500':
           description: Failed to remove build
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
         '401':
           description: "Cleanup failed: secret key could not be confirmed"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/authentication-error"
+                $ref: "#/components/schemas/AuthenticationError"
         '400':
           description: "No hash supplied"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
 
   /cleanup/forceall:
     get:
@@ -489,19 +483,19 @@ paths:
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/cleanup'
+                  $ref: '#/components/schemas/Cleanup'
         '500':
           description: Failed to remove builds
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/general-error"
+                $ref: "#/components/schemas/GeneralError"
         '401':
           description: "Cleanup failed: secret key could not be confirmed"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/authentication-error"
+                $ref: "#/components/schemas/AuthenticationError"
 
 components:
   securitySchemes:
@@ -514,7 +508,7 @@ components:
       name: settings
       in: query
       required: false
-      description: The settings to be used for the analysis
+      description: The settings to be used for the analysis. Must satisfy a shema retrieved from [Schema](#tag/Analysis/paths/~1schema/get).
       schema:
         $ref: '#/components/schemas/SettingsSchema'
     ModeParam:
@@ -551,7 +545,7 @@ components:
       name: minify
       in: query
       required: false
-      description: If set to true some attributes needed for the frontend will be excluded from the response.
+      description: If set to true, some attributes needed for the frontend will be excluded from the response.
       schema:
         type: boolean
         default: false
@@ -589,9 +583,7 @@ components:
           - sv
           - "no"
   schemas:
-    SettingsSchema:
-      $ref: 'sparv_settings.json'
-    status:
+    StatusSchema:
       type: object
       properties:
         builds:
@@ -613,7 +605,7 @@ components:
               status:
                 type: string
                 example: Done
-    ping:
+    PingSchema:
       type: object
       properties:
         message:
@@ -622,7 +614,7 @@ components:
         time:
           type: integer
           example: 0.0081
-    general-error:
+    GeneralError:
       type: object
       properties:
         error:
@@ -631,7 +623,7 @@ components:
             message:
               type: string
               example: Some error message
-    authentication-error:
+    AuthenticationError:
       type: object
       properties:
         error:
@@ -640,7 +632,7 @@ components:
             message:
               type: string
               example: Authentication failed.
-    makefile:
+    MakefileSchema:
       type: object
       properties:
         makefile:
@@ -669,7 +661,7 @@ components:
             paragraph_segmenter = blanklines
 
             include $(SPARV_MAKEFILES)/Makefile.rules
-    file-result:
+    FileSchema:
       type: object
       properties:
         build:
@@ -687,7 +679,7 @@ components:
             link:
               type: string
               example: "[SBURL]/download?hash=a1b1de8f3508c5928352dbfc538025231a336801-f"
-    cleanup:
+    Cleanup:
       type: object
       properties:
         removed-builds:
@@ -695,7 +687,7 @@ components:
             type: array
             format: string
             example: [d91d063efb5a8439643147c7367e3a4ddad5ec63, a1b1de8f3508c5928352dbfc538025231a336801-f]
-    cleanup-one:
+    CleanupOne:
       type: object
       properties:
         removed-builds:
@@ -703,9 +695,83 @@ components:
             type: array
             format: string
             example: [d91d063efb5a8439643147c7367e3a4ddad5ec63]
-    no-cleanup:
+    NoCleanup:
       type: object
       properties:
         message:
           type: string
           example: No hashes to be removed.
+    AnalysisSchema:
+      type: object
+      properties:
+        build:
+          type: object
+          properties:
+            hash:
+              type: string
+              example: ece7233cc6fface3adeef4bfc5dc1e9fdfd94488
+        corpus:
+          type: object
+          properties:
+            link:
+              type: string
+              example: "[SBURL]/download?hash=ece7233cc6fface3adeef4bfc5dc1e9fdfd94488"
+            analysis:
+              type: string
+              example: |
+                <corpus>
+                  <text lix="54.00" ovix="inf" nk="inf">
+                    <paragraph>
+                        <sentence id="8f7-84d">
+                            <w pos="DT" msd="DT.UTR.SIN.IND" lemma="|en|" lex="|en..al.1|" sense="|den..1:-1.000|en..2:-1.000|" complemgram="|" compwf="|" sentiment="" sentimentclass="" ref="1" dephead="2" deprel="DT">En</w>
+                            <w pos="NN" msd="NN.UTR.SIN.IND.NOM" lemma="|exempelmening|" lex="|" sense="|" complemgram="|exempel..nn.1+mening..nn.1:1.090e-08|" compwf="|exempel+mening|" sentiment="" sentimentclass="" ref="2" dephead="" deprel="ROOT">exempelmening</w>
+                            <w pos="PP" msd="PP" lemma="|till|" lex="|till..pp.1|" sense="|till..1:-1.000|" complemgram="|" compwf="|" sentiment="" sentimentclass="" ref="3" dephead="2" deprel="ET">till</w>
+                            <w pos="NN" msd="NN.UTR.SIN.DEF.NOM" lemma="|nättjänst|nättjänsten|" lex="|" sense="|" complemgram="|nät..nn.1+tjänst..nn.2:5.711e-11|nät..nn.1+tjänst..nn.1:5.711e-11|nätt..av.1+tjänst..nn.1:1.004e-12|nätt..av.1+tjänst..nn.2:1.004e-12|nät..nn.1+tjäna..vb.1+sten..nn.2:2.049e-27|nät..nn.1+tjäna..vb.1+sten..nn.1:2.049e-27|nätt..av.1+tjäna..vb.1+sten..nn.2:4.784e-28|nätt..av.1+tjäna..vb.1+sten..nn.1:4.784e-28|" compwf="|nät+tjänsten|nätt+tjänsten|nät+tjän+sten|nätt+tjän+sten|" sentiment="" sentimentclass="" ref="4" dephead="3" deprel="PA">nättjänsten</w>
+                        </sentence>
+                    </paragraph>
+                  </text>
+                </corpus>
+    JoinSchema:
+      type: object
+      properties:
+        settings:
+          $ref: "#/components/schemas/SettingsSchema"
+        original:
+          type: text
+          example: "&lt;text&gt;En exempelmening till nättjänsten&lt;/text&gt;"
+        analysis:
+          $ref: "#/components/schemas/AnalysisSchema"
+    SettingsSchema:
+      type: obejct
+      example:
+        corpus: exempelkorpus
+        lang: sv
+        textmode: plain
+        word_segmenter: default_tokenizer
+        sentence_segmentation:
+          sentence_chunk: paragraph
+          sentence_segmenter: default_tokenizer
+        paragraph_segmentation:
+          paragraph_segmenter: blanklines
+        positional_attributes:
+          lexical_attributes:
+            - pos
+            - msd
+            - lemma
+            - lex
+            - sense
+          compound_attributes:
+            - complemgram
+            - compwf
+          dependency_attributes:
+            - ref
+            - dephead
+            - deprel
+          sentiment:
+            - sentiment
+        named_entity_recognition: []
+        text_attributes:
+          readability_metrics:
+            - lix
+            - ovix
+            - nk

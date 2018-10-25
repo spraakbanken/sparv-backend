@@ -8,7 +8,7 @@ from xml.sax.saxutils import escape
 import logging
 import time
 import os
-import yaml
+import oyaml
 
 from make_makefile import makefile
 from schema_generator import make_schema
@@ -213,7 +213,8 @@ def apispec():
     # Replace placeholders
     yaml_doc = yaml_doc.replace("[SBURL]", SB_API_URL)
     yaml_doc = yaml_doc.replace("[VERSION]", VERSION)
-    data = yaml.load(yaml_doc)
+
+    data = oyaml.load(yaml_doc)
     return jsonify(data), 200
 
 
