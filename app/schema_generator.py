@@ -16,8 +16,8 @@ def make_schema(lang, mode, minify=False):
     analysis = TOOL_DICT.get(lang, "sv")
 
     schema = OrderedDict([
-        ("struct_tag", struct_tag),
-        ("struct_tag_simple", struct_tag_simple),
+        ("struct_tag", struct_tag if mode != "plain" else None),
+        ("struct_tag_simple", struct_tag_simple if mode != "plain" else None),
         ("title", "Corpus pipeline makefile settings"),
         ("title_sv", "Makefilsinställningar till korpusimportkedjan"),
         ("documentation", "Settings that generate the Makefile for the corpus pipeline"),
@@ -40,7 +40,7 @@ def make_schema(lang, mode, minify=False):
     [i for i in remove_nones(schema)]
 
     if minify:
-        # Remove entries from json which are note valid
+        # Remove entries from json that are only needed for the frontend and which are note valid
         # according to https://tools.ietf.org/html/draft-wright-json-schema-validation-00
         for k in ["title_sv", "description_sv", "class", "documentation"]:
             [i for i in remove_key(k, schema)]
@@ -102,11 +102,13 @@ corpus = {
 def lang_prop(lang):
     # This property will be hidden in the form
     # because the enum contains only one value
+    all_languages = list(TOOL_DICT.keys())
+
     return {
         "title": "Analysis mode",
         "title_sv": "Analysmode",
-        "default": lang,
-        "enum": [lang],
+        "default": "sv" if lang == "all" else lang,
+        "enum": all_languages if lang == "all" else [lang],
         "type": "string"
     }
 
@@ -114,13 +116,14 @@ def lang_prop(lang):
 def textmode_prop(mode):
     # This property will be hidden in the form
     # because the enum contains only one value
+    all_modes = ["plain", "xml", "file"]
     return {
         "title": "Text input mode",
         "title_sv": "Textläge",
         "description": "Input format for the pipeline",
         "description_sv": "Indataformatet till importkedjan",
-        "default": mode,
-        "enum": [mode],
+        "default": "plain" if mode == "all" else mode,
+        "enum": all_modes if mode == "all" else [mode],
         "type": "string"
     }
 
@@ -477,13 +480,13 @@ def positional_attributes(lang, analysis):
                     "type": "string",
                     "enum": sentiment
                 }
-            } if lang in ["sv", "sv-dev", "sv-1800"] else None)
+            } if lang in ["sv", "sv-dev", "sv-1800", "all"] else None)
         ]),
     }
 
 
 def named_entity_recognition(lang):
-    if lang in ["sv", "sv-dev", "sv-1800"]:
+    if lang in ["sv", "sv-dev", "sv-1800", "all"]:
         return {
             "title": "Named entity recognition",
             "title_sv": "Namntaggare",
