@@ -17,6 +17,13 @@ class Config(object):
     wsgi_host = '0.0.0.0'
     wsgi_port = 8801
 
+    # Secret key for dangerous queries
+    secret_key = ""
+
+    # URL and API version number that will be displayed in the documentation
+    api_url = "https://ws.spraakbanken.gu.se/ws/sparv/v3"
+    api_version = "3.0"
+
     # Path to pipeline (not necessary, only used within this script)
     pipeline_dir = os.path.join(str(Path(__file__).parents[1]), 'data', 'sparv-pipeline')
 
@@ -35,9 +42,6 @@ class Config(object):
     # Where the models and makefiles are hosted (SPARV_MODELS, SPARV_MAKEFILES)
     sparv_models = os.path.join(pipeline_dir, 'models')
     sparv_makefiles = os.path.join(pipeline_dir, 'makefiles')
-
-    # Secret key for dangerous queries
-    secret_key = ""
 
     # Path to python virtual environment
     # (optional, not needed when running with Docker or when venv is activated manually)

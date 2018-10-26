@@ -137,9 +137,9 @@ def api():
 
     log.debug('index page')
 
-    # SB_API_URL = Config.backend + "/"
-    SB_API_URL = "https://ws.spraakbanken.gu.se/ws/sparv/v2/"
-    VERSION = "2"
+    # API_URL = Config.backend
+    API_URL = Config.api_url
+    VERSION = Config.api_version
     STYLES_CSS = "static/api.css"
     LOGO = "static/sparv_light.png"
     ICON = "static/sparv.png"
@@ -156,7 +156,7 @@ def api():
 
     # Replace placeholders
     # md_text = md_text.replace("[URL]", request.base_url)
-    md_text = md_text.replace("[SBURL]", SB_API_URL)
+    md_text = md_text.replace("[URL]", API_URL)
     md_text = md_text.replace("[VERSION]", VERSION)
 
     # Convert Markdown to HTML
@@ -199,9 +199,9 @@ def api():
 def apispec():
     """Serve API specification (JSON)."""
 
-    # SB_API_URL = Config.backend + "/"
-    SB_API_URL = "https://ws.spraakbanken.gu.se/ws/sparv/v2"
-    VERSION = "3.0"
+    # API_URL = Config.backend
+    API_URL = Config.api_url
+    VERSION = Config.api_version
 
     # Open oas file
     doc_dir = "templates"
@@ -211,7 +211,7 @@ def apispec():
         yaml_doc = yaml_doc.decode("UTF-8")
 
     # Replace placeholders
-    yaml_doc = yaml_doc.replace("[SBURL]", SB_API_URL)
+    yaml_doc = yaml_doc.replace("[URL]", API_URL)
     yaml_doc = yaml_doc.replace("[VERSION]", VERSION)
 
     data = oyaml.load(yaml_doc)
