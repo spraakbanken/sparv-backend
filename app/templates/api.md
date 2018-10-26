@@ -213,8 +213,11 @@ Pings the backend, responds with the status of the catapult.
 * **example:** [`/ping`]([URL]/ping)
 * **result:**
 
-```.xml
-<catapult time="0.0063">PONG</catapult>
+```.json
+{
+  "message": "PONG",
+  "time": 0.0081
+}
 ```
 
 ## schema
@@ -375,12 +378,25 @@ Requires `secret_key` parameter in query.
 * **example:** `[URL]/status?secret_key=supersekretkey`
 * **result:**
 
-```.xml
-<status>
-  <build hash="d91d063efb5a8439643147c7367e3a4ddad5ec63" status="Done" since="2018-05-11 18:48:32" accessed="2018-05-11 18:29:57" accessed-secs-ago="326021.5"/>
-  <build hash="736e99a73b5c9fdc1d284397a8790df17afe3214-f" status="Done" since="2018-05-11 18:49:57" accessed="2018-05-11 15:38:19" accessed-secs-ago="336318.9"/>
-  <build hash="57fce7e430c7ab4dd83d5244b566dade92595db2" status="Done" since="2018-05-11 18:48:45" accessed="2018-05-15 11:47:15" accessed-secs-ago="4582.9"/>
-</status>
+```.json
+{
+  "builds": [
+    {
+      "accessed": "2018-05-11 18:29:57",
+      "accessed-secs-ago": 326021.5,
+      "hash": "d91d063efb5a8439643147c7367e3a4ddad5ec63",
+      "since": "2018-05-11 18:48:32",
+      "status": "Done"
+    },
+    {
+      "accessed": "2018-05-11 15:38:19",
+      "accessed-secs-ago": 336318.9,
+      "hash": "736e99a73b5c9fdc1d284397a8790df17afe3214",
+      "since": "2018-05-11 18:49:57",
+      "status": "Done"
+    }
+  ]
+}
 ```
 
 ## cleanup
@@ -393,18 +409,22 @@ timeout (7 days). Requires `secret_key` parameter in query.
 * **example:** `[URL]/cleanup?secret_key=supersekretkey`
 * **result:**
 
-```.xml
-<message>
-    <removed hash="1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805"/>
-    <removed hash="34dfdc2538023e44e7892ee9ac7f1071c6349544"/>
-    <removed hash="2cac2b20734661dca6c388c46153aff79380d6d8"/>
-</message>
+```.json
+{
+  "removed-builds": [
+    "1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805",
+    "34dfdc2538023e44e7892ee9ac7f1071c6349544",
+    "2cac2b20734661dca6c388c46153aff79380d6d8"
+  ]
+}
 ```
 
 Or if there are no old builds:
 
-```.xml
-<message>No hashes to be removed.</message>
+```.json
+{
+  "message": "No hashes to be removed."
+}
 ```
 
 
@@ -419,18 +439,22 @@ the builds with status Error. Requires `secret_key` parameter in query.
 * **example:** `[URL]/cleanup/errors?secret_key=supersekretkey`
 * **result:**
 
-```.xml
-<message>
-    <removed hash="1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805"/>
-    <removed hash="34dfdc2538023e44e7892ee9ac7f1071c6349544"/>
-    <removed hash="2cac2b20734661dca6c388c46153aff79380d6d8"/>
-</message>
+```.json
+{
+  "removed-builds": [
+    "1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805",
+    "34dfdc2538023e44e7892ee9ac7f1071c6349544",
+    "2cac2b20734661dca6c388c46153aff79380d6d8"
+  ]
+}
 ```
 
 Or if there are no builds with status Error:
 
-```.xml
-<message>No hashes to be removed.</message>
+```.json
+{
+  "message": "No hashes to be removed."
+}
 ```
 
 ## cleanup/forceone
@@ -443,10 +467,12 @@ Removes a single build. Requires `secret_key` and `hash` parameter in query.
 * **example:** `[URL]/cleanup/forceone?secret_key=supersekretkey&hash=1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805`
 * **result:**
 
-```.xml
-<message>
-    <removed hash="1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805"/>
-</message>
+```.json
+{
+  "removed-builds": [
+    "1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805"
+  ]
+}
 ```
 
 ## cleanup/forceall
@@ -458,25 +484,29 @@ Removes all the existing builds. Requires `secret_key` parameter in query.
 * **example:** `[URL]/cleanup/forceall?secret_key=supersekretkey`
 * **result:**
 
-```.xml
-<message>
-    <removed hash="1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805"/>
-    <removed hash="34dfdc2538023e44e7892ee9ac7f1071c6349544"/>
-    <removed hash="2cac2b20734661dca6c388c46153aff79380d6d8"/>
-</message>
+```.json
+{
+  "removed-builds": [
+    "1e1c4cdb04d593f1526ae21dd3908cfa7e6ca805",
+    "34dfdc2538023e44e7892ee9ac7f1071c6349544",
+    "2cac2b20734661dca6c388c46153aff79380d6d8"
+  ]
+}
 ```
 
 Or if there are no builds:
 
-```.xml
-<message>No hashes to be removed.</message>
+```.json
+{
+  "message": "No hashes to be removed."
+}
 ```
 
 # Example settings
 
 Swedish plain text input (default mode):
 
-    settings={
+    {
         "corpus": "exempelkorpus",
         "lang": "sv",
         "textmode": "plain",
@@ -522,7 +552,7 @@ Swedish plain text input (default mode):
 
 Swedish with xml input:
 
-    settings={
+    {
         "corpus": "exempelkorpus",
         "lang": "sv",
         "textmode": "xml",
@@ -588,7 +618,7 @@ Swedish with xml input:
 
 English (analysed with FreeLing):
 
-    settings={
+    {
         "corpus": "example",
         "lang": "en",
         "textmode": "xml",
@@ -615,7 +645,7 @@ English (analysed with FreeLing):
 
 Finnish (analysed with TreeTagger):
 
-    settings={
+    {
         "corpus": "example",
         "lang": "fi",
         "textmode": "xml",
@@ -654,7 +684,7 @@ Finnish (analysed with TreeTagger):
 
 Swedish development mode (Sparv labs):
 
-    settings={
+    {
         "corpus": "exempelkorpus",
         "lang": "sv-dev",
         "textmode": "plain",

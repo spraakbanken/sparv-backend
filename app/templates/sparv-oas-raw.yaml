@@ -10,7 +10,7 @@ info:
 
     You can read more about Sparv on [Språkbanken's web page](https://spraakbanken.gu.se/eng/research/infrastructure/sparv).
   x-logo:
-    url: [URL]/sparv_frame.png
+    url: [URL]/static/sparv_frame.png
   contact:
     name: Språkbanken
     url: https://spraakbanken.gu.se/
@@ -683,18 +683,18 @@ components:
       type: object
       properties:
         removed-builds:
+          example: [d91d063efb5a8439643147c7367e3a4ddad5ec63, a1b1de8f3508c5928352dbfc538025231a336801-f]
           items:
             type: array
             format: string
-            example: [d91d063efb5a8439643147c7367e3a4ddad5ec63, a1b1de8f3508c5928352dbfc538025231a336801-f]
     CleanupOne:
       type: object
       properties:
         removed-builds:
+          example: [d91d063efb5a8439643147c7367e3a4ddad5ec63]
           items:
             type: array
             format: string
-            example: [d91d063efb5a8439643147c7367e3a4ddad5ec63]
     NoCleanup:
       type: object
       properties:
