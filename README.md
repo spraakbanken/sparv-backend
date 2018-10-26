@@ -14,10 +14,12 @@ There are several options for running the Sparv backend:
 * [GNU Make](https://www.gnu.org/software/make/)
 
 ## Installation
-* Clone this project:
+* Clone this project and its submodules:
    ```
    git clone https://github.com/spraakbanken/sparv-backend.git
    cd sparv-backend
+   git submodule init
+   git submodule update
    ```
 
 * Create config.py and adapt variables:
