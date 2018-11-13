@@ -45,10 +45,6 @@ def hello_world():
 
 @app.route('/', methods=['GET', 'POST'])
 def text_input():
-    # On empty input return api description
-    if not request.values:
-        return api()
-
     try:
         log.info("Starting a new build with text input procedure")
         lang = request.values.get('language', 'sv')
@@ -132,71 +128,6 @@ def join():
         log.exception("Error in /join")
         res = '<result>\n<trace>' + escape(trace) + '</trace>\n</result>\n'
         return Response(res, mimetype='application/xml')
-
-
-@app.route('/api')
-def api():
-    """Render API documentation."""
-    import markdown
-
-    log.debug('index page')
-
-    # API_URL = Config.backend
-    API_URL = Config.api_url
-    VERSION = Config.api_version
-    STYLES_CSS = "static/api.css"
-    LOGO = "static/sparv_light.png"
-    ICON = "static/sparv.png"
-
-    # doc_dir = os.path.join(configM.setupconfig['ABSOLUTE_PATH'], 'html')
-    doc_dir = "templates"
-    doc_file = 'api.md'
-
-    with app.open_resource(os.path.join(doc_dir, doc_file)) as doc:
-        md_text = doc.read()
-        log.debug("md_text: %s", type(md_text))
-        md_text = md_text.decode("UTF-8")
-        log.debug("md_text: %s", type(md_text))
-
-    # Replace placeholders
-    # md_text = md_text.replace("[URL]", request.base_url)
-    md_text = md_text.replace("[URL]", API_URL)
-    md_text = md_text.replace("[VERSION]", VERSION)
-
-    # Convert Markdown to HTML
-    md = markdown.Markdown(extensions=["markdown.extensions.toc",
-                                       "markdown.extensions.smarty",
-                                       "markdown.extensions.def_list",
-                                       "markdown.extensions.tables",
-                                       "markdown.extensions.fenced_code"])
-    md_html = md.convert(md_text)
-
-    html = ["""<!doctype html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Sparv API v%s</title>
-            <link rel="shortcut icon" type="image/x-icon" href="%s"/>
-            <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css"
-              rel="stylesheet">
-            <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-            <script>hljs.initHighlightingOnLoad();</script>
-            <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-            <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-            <link href="%s" rel="stylesheet">
-          </head>
-          <body>
-            <div class="toc-wrapper">
-              <div class="header">
-                <img src="%s"><br><br>
-                Sparv API <span>v%s</span>
-              </div>
-              %s
-            </div>
-           <div class="content">
-            """ % (VERSION, ICON, STYLES_CSS, LOGO, VERSION, md.toc), md_html, "</div></body></html>"]
-
-    return "\n".join(html)
 
 
 @app.route('/apispec')
