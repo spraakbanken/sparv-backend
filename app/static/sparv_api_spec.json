@@ -366,6 +366,9 @@
                         "$ref": "#/components/parameters/ModeParam"
                     },
                     {
+                        "$ref": "#/components/parameters/IncrementalParam"
+                    },
+                    {
                         "$ref": "#/components/parameters/LanguageParam"
                     },
                     {
@@ -871,7 +874,7 @@
                             }
                         }
                     },
-                    "corpus": {
+                    "result": {
                         "type": "object",
                         "properties": {
                             "link": {
@@ -932,7 +935,7 @@
                             }
                         }
                     },
-                    "corpus": {
+                    "result": {
                         "type": "object",
                         "properties": {
                             "link": {

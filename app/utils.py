@@ -9,6 +9,7 @@ import errno
 import logging
 import os
 import time
+import json
 import urllib.parse
 
 log = logging.getLogger('pipeline.' + __name__)
@@ -51,7 +52,8 @@ ERROR_MSG = {
     "no_result": "No result found. Something went wrong in the corpus pipeline.",
     "empty_input": "No input was found.",
     "no_files": "No files provided for upload.",
-    "make_error": "Error occurred while running make."
+    "make_error": "Error occurred while running make.",
+    "unexpected": "An unexpected error occurred."
 }
 
 UTF8 = "UTF-8"
@@ -144,5 +146,25 @@ def rmdir(d):
 
 
 def make_trace():
-    """ Return a traceback."""
+    """Return a traceback."""
     return "".join(traceback.format_exception(*sys.exc_info()))
+
+
+def make_error_msg(msg, stringify=False, **kwargs):
+    """Create error message as dictionary or as string if stringify=True."""
+    data = {
+        "error": {
+            "message": msg,
+        }
+    }
+    for key in kwargs:
+        data["error"][key] = kwargs[key]
+    if stringify:
+        return stringify_dict(data)
+    else:
+        return data
+
+
+def stringify_dict(data):
+    """Convert dictionary to string and remove outer brackets."""
+    return json.dumps(data)[1:-1]

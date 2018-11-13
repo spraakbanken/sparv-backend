@@ -9,11 +9,12 @@ import logging
 import time
 import os
 import oyaml
+import json
 
+import utils
 from make_makefile import makefile
 from schema_generator import make_schema
-from utils import pretty_epoch_time, get_build_directories, rmdir, ERROR_MSG, make_trace, UTF8
-from handler_utils import build, upload_procedure, get_settings, join_from_hash, check_secret_key, jsonify_error
+from handler_utils import build, upload_procedure, get_settings, join_from_hash, check_secret_key
 from enums import Status, finished
 try:
     from config import Config
@@ -58,25 +59,25 @@ def text_input():
         settings, incremental = get_settings(lang, mode)
 
         def generate(mode, builds, txt, settings, incremental):
-            yield "<result>\n".encode("UTF-8")
-            # Escape plain text and give it a root element
-            if mode == "plain":
-                txt = escape(txt)
-                txt = "<text>" + txt + "</text>"
             # Check for empty input
             if not txt:
-                log.exception(ERROR_MSG["empty_input"])
-                yield "<error>%s</error>\n</result>" % ERROR_MSG["empty_input"]
+                log.exception(utils.ERROR_MSG["empty_input"])
+                yield json.dumps(utils.make_error_msg(utils.ERROR_MSG["empty_input"]))
             else:
-                for node in build(builds, txt, settings, incremental, "xml"):
-                    yield node
+                # Escape plain text and give it a root element
+                if mode == "plain":
+                    txt = escape(txt)
+                    txt = "<text>" + txt + "</text>"
 
-        return Response(generate(mode, builds, txt, settings, incremental), mimetype='application/xml')
+                for node in build(builds, txt, settings, incremental, "xml"):
+                    yield str(node).encode(utils.UTF8)
+
+        return Response(generate(mode, builds, txt, settings, incremental), mimetype='application/json')
     except:
-        trace = make_trace()
-        log.exception("Error in text input procedure")
-        res = '<result>\n<trace>' + escape(trace) + '</trace>\n</result>\n'
-        return Response(res, mimetype='application/xml')
+        trace = utils.make_trace()
+        log.exception("Error in text input procedure.\nTrace: %s", trace)
+        data = utils.make_error_msg(utils.ERROR_MSG["unexpected"], trace=escape(trace))
+        return jsonify(data), 500
 
 
 @app.route('/schema')
@@ -99,12 +100,15 @@ def get_makefile():
         mode = request.values.get('mode', 'plain')
         settings, incremental = get_settings(lang, mode)
         log.info("Returning makefile")
-        return Response(makefile(settings), mimetype='text/plain')
+        data = {"makefile": makefile(settings)}
+        status = 200
     except:
-        trace = make_trace()
+        trace = utils.make_trace()
         log.exception("Error in /makefile")
-        res = '<result>\n<trace>' + escape(trace) + '</trace>\n</result>\n'
-        return Response(res, mimetype='application/xml')
+        msg = "Could not generate Makefile."
+        data = utils.make_error_msg(msg, trace=escape(trace))
+        status = 500
+    return jsonify(data), status
 
 
 @app.route('/join', methods=['GET'])
@@ -124,7 +128,7 @@ def join():
 
         return Response(generate(builds, hashnumber, incremental), mimetype='text/plain')
     except:
-        trace = make_trace()
+        trace = utils.make_trace()
         log.exception("Error in /join")
         res = '<result>\n<trace>' + escape(trace) + '</trace>\n</result>\n'
         return Response(res, mimetype='application/xml')
@@ -235,8 +239,8 @@ def status():
                 build = {
                     "hash": h,
                     "status": Status.lookup[b.status],
-                    "since": pretty_epoch_time(b.status_change_time),
-                    "accessed": pretty_epoch_time(b.accessed_time),
+                    "since": utils.pretty_epoch_time(b.status_change_time),
+                    "accessed": utils.pretty_epoch_time(b.accessed_time),
                     "accessed-secs-ago": round(time.time() - b.accessed_time, 1)
 
                 }
@@ -244,7 +248,7 @@ def status():
         status = 200
     else:
         msg = "Failed to show status: secret key could not be confirmed."
-        data = jsonify_error(msg)
+        data = utils.make_error_msg(msg)
         status = 401
     return jsonify(data), status
 
@@ -260,12 +264,12 @@ def ping():
         from subprocess import Popen, PIPE
         cmd = [Config.catalaunch_binary, Config.socket_file, "PING"]
         stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
-        stdout = stdout.decode(UTF8)
-        stderr = stderr.decode(UTF8)
+        stdout = stdout.decode(utils.UTF8)
+        stderr = stderr.decode(utils.UTF8)
         t1 = time.time()
     except BaseException as e:
         msg = "Failed to ping catapult: %s" % e
-        data = jsonify_error(msg)
+        data = utils.make_error_msg(msg)
         return jsonify(data), 500
     else:
         t = round(t1 - t0, 4)
@@ -277,8 +281,8 @@ def ping():
             status = 200
         else:
             msg = "Something went wrong."
-            data = jsonify_error(msg, stdout=stdout, stderr=stderr,
-                                 catapult_time=t)
+            data = utils.make_error_msg(msg, stdout=stdout, stderr=stderr,
+                                  catapult_time=t)
             status = 500
         return jsonify(data), status
 
@@ -297,7 +301,7 @@ def file_upload():
         files = []
         for f in uploaded_files:
             name = f.filename[:f.filename.rfind(".")]
-            text = f.read().decode(UTF8)
+            text = f.read().decode(utils.UTF8)
             files.append((name, text))
 
         def generate(builds, settings, files, email):
@@ -306,10 +310,9 @@ def file_upload():
 
         return Response(generate(builds, settings, files, email), mimetype='application/xml')
     except:
-        trace = make_trace()
+        trace = utils.make_trace()
         log.exception("Error in /upload")
-        res = '<result>\n<trace>' + escape(trace) + '</trace>\n</result>\n'
-        return Response(res, mimetype='application/xml')
+        return utils.make_error_msg("Error in upload.", trace=escape(trace)), 500
 
 
 @app.route('/download')
@@ -364,7 +367,7 @@ def cleanup(timeout=604800, remove_errors=False):
         status = 200
     else:
         msg = "Failed to run cleanup: secret key could not be confirmed."
-        data = jsonify_error(msg)
+        data = utils.make_error_msg(msg)
         status = 401
 
     return jsonify(data), status
@@ -384,7 +387,7 @@ def cleanup_one():
 
     if not hash:
         msg = "Don't know what to remove. Please enter hash number in query!"
-        data = jsonify_error(msg)
+        data = utils.make_error_msg(msg)
         return jsonify(data), 400
 
     if check_secret_key(secret_key):
@@ -397,17 +400,17 @@ def cleanup_one():
         else:
             msg = "Failed to remove build: hash not found, trying to remove files."
             log.error(msg)
-            data = jsonify_error(msg)
+            data = utils.make_error_msg(msg)
             status = 400
-            if hash in get_build_directories(Config.builds_dir):
-                rmdir(os.path.join(Config.builds_dir, hash))
+            if hash in utils.get_build_directories(Config.builds_dir):
+                utils.rmdir(os.path.join(Config.builds_dir, hash))
                 log.info("Files removed for hash %s" % hash)
             else:
                 log.info("No files to be removed for hash %s" % hash)
     else:
         msg = "Failed to remove all builds: secret key could not be confirmed."
         log.error(msg)
-        data = jsonify_error(msg)
+        data = utils.make_error_msg(msg)
         status = 401
 
     return jsonify(data), status
@@ -422,7 +425,7 @@ def cleanup_all():
 
     if check_secret_key(secret_key):
         log.info("All builds will be removed.")
-        build_dirs = get_build_directories(Config.builds_dir)
+        build_dirs = utils.get_build_directories(Config.builds_dir)
         for hashnumber in build_dirs:
             b = builds.get(hashnumber, None)
             log.info("Removing %s" % hashnumber)
@@ -430,7 +433,7 @@ def cleanup_all():
                 to_remove.append(hashnumber)
                 b.remove_files()
             else:
-                rmdir(os.path.join(Config.builds_dir, hashnumber))
+                utils.rmdir(os.path.join(Config.builds_dir, hashnumber))
         data = {"removed_builds": []}
         for h in to_remove:
             del builds[h]
@@ -441,7 +444,7 @@ def cleanup_all():
     else:
         log.error("No builds will be removed.")
         msg = "Failed to run cleanup: secret key could not be confirmed."
-        data = jsonify_error(msg)
+        data = utils.make_error_msg(msg)
         status = 401
 
     return jsonify(data), status

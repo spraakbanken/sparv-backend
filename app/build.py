@@ -6,6 +6,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import str, object
 from xml.sax.saxutils import escape
+from subprocess import call
 
 import time
 import os
@@ -14,14 +15,13 @@ import zipfile
 import io
 import re
 
+import utils
 try:
     from config import Config
 except ImportError:
     from config_default import Config
 from enums import Status, Message, finished
 from make_makefile import makefile
-from utils import make_hash, make, mkdir, rmdir, ERROR_MSG, make_trace, UTF8
-from subprocess import call
 
 log = logging.getLogger('pipeline.' + __name__)
 
@@ -67,11 +67,11 @@ class Build(object):
             if files:
                 self.text = "\n".join(text for _fn, text in files)
                 filenames = " ".join(fn for fn, _text in files)
-                self.build_hash = make_hash(self.text, self.makefile_contents, filenames) + Config.fileupload_ext
+                self.build_hash = utils.make_hash(self.text, self.makefile_contents, filenames) + Config.fileupload_ext
             else:
                 self.text = text
                 self.filename = 'text'
-                self.build_hash = make_hash(self.text, self.makefile_contents)
+                self.build_hash = utils.make_hash(self.text, self.makefile_contents)
 
         # Directories
         self.directory = os.path.join(Config.builds_dir, self.build_hash)
@@ -119,7 +119,15 @@ class Build(object):
 
     def increment_msg(self):
         """The current increment message"""
-        return '<increment command="%s" step="%s" steps="%s"/>\n' % (self.command, self.step, self.steps)
+        # return '<increment command="%s" step="%s" steps="%s"/>\n' % (self.command, self.step, self.steps)
+        data = [{"command": self.command,
+                 "step": self.step,
+                 "steps": self.steps
+                 }]
+        if self.step == self.steps:
+            return utils.stringify_dict(data)
+        else:
+            return utils.stringify_dict(data) + ",\n"
 
     def send_to_all(self, msg):
         """Send a message to all listeners."""
@@ -182,9 +190,8 @@ class Build(object):
         self.access()
 
         # Make directories
-        # map(mkdir, [self.directory, self.original_dir, self.annotations_dir, self.export_dir])
         for i in [self.directory, self.original_dir, self.annotations_dir, self.export_dir]:
-            mkdir(i)
+            utils.mkdir(i)
 
         # Make makefile
         with open(self.makefile, 'w') as f:
@@ -215,7 +222,7 @@ class Build(object):
         """Remove the files associated with this build."""
         self.change_status(Status.Deleted)
         log.info("Removing files")
-        rmdir(self.directory)
+        utils.rmdir(self.directory)
 
     def _run(self, fmt):
         """
@@ -251,32 +258,32 @@ class Build(object):
                 self.textfiles.append(os.path.join(self.annotations_dir, filename + '.@TEXT'))
 
             # Try to parse files first
-            stdout, stderr = make(make_init).communicate("")
+            stdout, stderr = utils.make(make_init).communicate("")
             self.change_status(Status.Parsing)
             # Send warnings
             for out_file in self.textfiles:
                 if not os.path.exists(out_file):
                     send_warnings()
                     self.change_status(Status.ParseError)
-                    log.error(ERROR_MSG["parsing_error"])
+                    log.error(utils.ERROR_MSG["parsing_error"])
                     return
 
         else:
             # Try to parse file first
             self.textfile = os.path.join(self.annotations_dir, self.filename + '.@TEXT')
-            stdout, stderr = make(make_init).communicate("")
+            stdout, stderr = utils.make(make_init).communicate("")
             self.change_status(Status.Parsing)
             if stderr:
                 send_warnings()
                 self.change_status(Status.Error)
                 self.stderr = stderr.rstrip().decode("UTF-8")
-                log.error(ERROR_MSG["make_error"])
+                log.error(utils.ERROR_MSG["make_error"])
                 return
             # Send warnings
             if not os.path.exists(self.textfile):
                 send_warnings()
                 self.change_status(Status.ParseError)
-                log.error(ERROR_MSG["parsing_error"])
+                log.error(utils.ERROR_MSG["parsing_error"])
                 return
 
             if fmt == 'vrt' or fmt == 'cwb':
@@ -287,10 +294,10 @@ class Build(object):
                 self.out_file = os.path.join(self.export_dir, self.filename + '.xml')
 
         # Do a dry run to get the number of invocations that will be made
-        stdout, stderr = make(make_settings + ['--dry-run']).communicate("")
-        self.stderr = stderr.decode(UTF8)
+        stdout, stderr = utils.make(make_settings + ['--dry-run']).communicate("")
+        self.stderr = stderr.decode(utils.UTF8)
         assert(self.stderr == "")
-        steps = stdout.decode(UTF8).count(Config.python_interpreter)
+        steps = stdout.decode(utils.UTF8).count(Config.python_interpreter)
 
         # No remote installations allowed
         os.environ['remote_cwb_datadir'] = "null"
@@ -298,14 +305,14 @@ class Build(object):
         os.environ['remote_host'] = "null"
 
         # Now, make!
-        self.make_process = make(make_settings)
+        self.make_process = utils.make(make_settings)
         self.change_status(Status.Running)
 
         # Process the output from make
         self.change_step(new_cmd="", new_step=0, new_steps=steps + 1)
         step = 0
         for line in iter(self.make_process.stdout.readline, b''):
-            line = line.decode(UTF8)
+            line = line.decode(utils.UTF8)
             self.make_out.append(line)
             if Config.python_interpreter in line:
                 step += 1
@@ -335,8 +342,8 @@ class Build(object):
         try:
             self._run(fmt)
         except:
-            self.trace = make_trace()
-            log.exception(ERROR_MSG["make_error"])
+            self.trace = utils.make_trace()
+            log.exception(utils.ERROR_MSG["make_error"])
             self.stdout = "".join(self.make_out)
             if self.make_process:
                 self.stderr = self.make_process.stderr.read().rstrip()
@@ -372,17 +379,19 @@ class Build(object):
                             zipf.write(os.path.join(root, xmlfile), arcname="korpus/" + newfilename)
                 return filelike
             else:
-                # används inte just nu
-                out = ['<trace>' + escape(self.trace) + '</trace>',
-                       '<stderr>' + escape(self.stderr) + '</stderr>',
-                       '<stdout>' + escape(self.stdout) + '</stdout>']
-                return "\n".join(out) + "\n"
+                # Not in use right now
+                return utils.make_error_msg(utils.ERROR_MSG["no_result"],
+                                            stringify=True,
+                                            trace=escape(self.trace),
+                                            stderr=escape(self.stderr),
+                                            stdout=escape(self.stdout))
         else:
-            # används inte just nu
-            out = ['<trace>' + escape(self.trace) + '</trace>',
-                   '<stderr>' + escape(self.stderr) + '</stderr>',
-                   '<stdout>' + escape(self.stdout) + '</stdout>']
-            return "\n".join(out) + "\n"
+            # Not in use right now
+            return utils.make_error_msg(utils.ERROR_MSG["no_result"],
+                                        stringify=True,
+                                        trace=escape(self.trace),
+                                        stderr=escape(self.stderr),
+                                        stdout=escape(self.stdout))
 
     def result(self):
         """
@@ -390,33 +399,32 @@ class Build(object):
         or the error messages for an unsuccessful build.
         """
         assert(finished(self.status))
-        out = []
+        out = {}
 
         # Result when Parse Error
         if self.status == Status.ParseError:
             if self.warnings:
-                out.append('<warning>' + escape(self.warnings) + '</warning>')
-                out.append("<error>%s</error>" % ERROR_MSG["parsing_error"])
-                log.error(ERROR_MSG["parsing_error"])
-                return "\n".join(out)
+                log.error(utils.ERROR_MSG["parsing_error"])
+                return utils.make_error_msg(utils.ERROR_MSG["parsing_error"],
+                                            stringify=True,
+                                            warning=escape(self.warnings))
 
         # Result when Done
         elif self.status == Status.Done:
             download_link = "%s/download?hash=%s" % (Config.backend, self.build_hash)
+            out["link"] = download_link
 
             if self.warnings:
-                out.append('<warning>' + escape(self.warnings) + '</warning>')
+                out["warning"] = escape(self.warnings)
 
             if hasattr(self, 'out_files'):
                 for out_file in self.out_files:
                     if not os.path.exists(out_file):
                         self.change_status(Status.Error)
-                        out.append("<error>%s</error>" % ERROR_MSG["missing_file"])
-                        log.error(ERROR_MSG["missing_file"])
-                        return "\n".join(out)
-
-                result = "<corpus link='%s'/>\n" % download_link
-                return result
+                        log.error(utils.ERROR_MSG["missing_file"])
+                        out["error"] = utils.make_error_msg(utils.ERROR_MSG["missing_file"])["error"]
+                        return utils.stringify_dict(out)
+                return utils.stringify_dict(out)
 
             else:
                 # Check for empty input (e.g. "<text></text>")
@@ -428,27 +436,27 @@ class Build(object):
                             raise ValueError('empty token.word file')
                 except:
                     self.change_status(Status.Error)
-                    log.exception(ERROR_MSG["empty_input"])
-                    return "<error>%s</error>" % ERROR_MSG["empty_input"]
+                    log.exception(utils.ERROR_MSG["empty_input"])
+                    return utils.make_error_msg(utils.ERROR_MSG["empty_input"], stringify=True)
 
-                # Check if result file is not empty
+                # Check for empty result file ("<corpus></corpus>")
                 try:
                     with open(self.out_file, "r") as f:
                         result_contents = f.read()
                         if not result_contents.strip("<corpus>\n").rstrip("</corpus>\n\n"):
                             raise ValueError('empty result file')
                         else:
-                            result_contents = result_contents.replace("<corpus", "<corpus link='%s'" % download_link)
-                            out.append(result_contents)
-                            return "\n".join(out)
+                            out["analysis"] = result_contents
+                            return utils.stringify_dict(out)
                 except:
                     self.change_status(Status.Error)
-                    log.exception(ERROR_MSG["no_result"])
-                    return "<error>%s</error>" % ERROR_MSG["no_result"]
+                    log.exception(utils.ERROR_MSG["no_result"])
+                    return utils.make_error_msg(utils.ERROR_MSG["no_result"], stringify=True)
 
+        # Something else went wrong
         else:
-            out = ['<trace>' + escape(self.trace) + '</trace>',
-                   '<stderr>' + escape(self.stderr) + '</stderr>',
-                   '<stdout>' + escape(self.stdout) + '</stdout>',
-                   '<error>' + ERROR_MSG["no_result"] + '</error>']
-            return "\n".join(out) + "\n"
+            return utils.make_error_msg(utils.ERROR_MSG["no_result"],
+                                        stringify=True,
+                                        trace=escape(self.trace),
+                                        stderr=escape(self.stderr),
+                                        stdout=escape(self.stdout))

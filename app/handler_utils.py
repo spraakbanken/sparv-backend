@@ -8,11 +8,11 @@ from werkzeug.utils import secure_filename
 from flask import Response, request, json
 import logging
 
+import utils
 from build import Build
 from enums import Status, Message, finished
 from schema_utils import validate_json
 from schema_generator import make_schema
-from utils import pretty_epoch_time, ERROR_MSG, make_trace
 try:
     from config import Config
 except ImportError:
@@ -44,7 +44,7 @@ def build(builds, original_text, settings, incremental, fmt, files=None):
     else:
         build = builds[build.build_hash]
         log.info("Joining existing build (%s) which started at %s" %
-                 (build.build_hash, pretty_epoch_time(build.status_change_time)))
+                 (build.build_hash, utils.pretty_epoch_time(build.status_change_time)))
 
     if files:
         return join_build(build, incremental, fileupload=True)
@@ -56,18 +56,18 @@ def join_from_hash(builds, hashnumber, incremental):
     """Join a build with a given hash number if it exists."""
     build = builds.get(hashnumber, None)
     if build is not None:
+        data = {"settings": build.get_settings(),
+                "original": escape(build.get_original())}
+        yield utils.stringify_dict(data)
+
         if hashnumber.endswith(Config.fileupload_ext):
-            yield ("<settings>%s</settings>\n<original %s/>\n"
-                   % (build.get_settings(), escape(build.get_original())))
             for node, _b in join_build(build, True, fileupload=True):
                 yield node
         else:
-            yield ("<settings>%s</settings>\n<original>%s</original>\n"
-                   % (build.get_settings(), escape(build.get_original())))
             for node in join_build(build, incremental):
                 yield node
     else:
-        yield "<error>No such build!</error>\n</result>\n"
+        yield utils.make_error_msg("No such build")
 
 
 def join_build(build, incremental, fileupload=False):
@@ -84,21 +84,27 @@ def join_build(build, incremental, fileupload=False):
         assert(finished(build.status))
         build.access()
         try:
-            return build.result() + '</result>\n'
+            return build.result()
         except Exception as error:
             log.error("Error while getting result: %s" % str(error))
-            return "<error>%s\n</error>\n</result>\n" % ERROR_MSG["no_result"]
+            return utils.make_error_msg(utils.ERROR_MSG["no_result"])
+
+    # Start sending incremental JSON
+    yield "{"
 
     # Send this build's hash
+    data = {"build": {"hash": build.build_hash}}
     if fileupload:
-        yield "<build hash='%s' type='files'/>\n" % build.build_hash, build
+        data["build"]["type"] = "files"
+        yield utils.stringify_dict(data), build
     else:
-        yield "<build hash='%s'/>\n" % build.build_hash
+        yield utils.stringify_dict(data)
+        yield ",\n"
 
     # Result already exists
     if finished(build.status):
         log.info("Result already exists since %s" %
-                 pretty_epoch_time(build.status_change_time))
+                 utils.pretty_epoch_time(build.status_change_time))
         if fileupload:
             yield get_result(), build
         else:
@@ -106,6 +112,9 @@ def join_build(build, incremental, fileupload=False):
 
     # Listen for completion
     else:
+        if incremental:
+            yield '"increment": [\n'
+
         if incremental and build.status == Status.Running:
             log.info("Already running, sending increment message")
             if fileupload:
@@ -120,6 +129,8 @@ def join_build(build, incremental, fileupload=False):
             # Has status changed to finished?
             if msg_type == Message.StatusChange:
                 if finished(msg):
+                    if incremental:
+                        yield "],"
                     break
             # Increment message
             elif incremental and msg_type == Message.Increment:
@@ -133,6 +144,9 @@ def join_build(build, incremental, fileupload=False):
             yield get_result(), build
         else:
             yield get_result()
+
+    # Close incremental JSON
+    yield "}"
 
 
 def get_files(infiles):
@@ -251,11 +265,10 @@ def upload_procedure(builds, settings, incremental, files, email):
     """The file upload procedure. Called by wrapper 'file_upload()'."""
 
     if not files:
-        log.exception(ERROR_MSG["no_files"])
-        yield '<result>\n<error>' + ERROR_MSG["no_files"] + '</error>\n</result>\n'
+        log.exception(utils.ERROR_MSG["no_files"])
+        yield utils.make_error_msg(utils.ERROR_MSG["no_files"])
         raise StopIteration
 
-    yield "<result>\n"
     log.info("Starting a new build with file upload procedure")
     for node, current_build in build(builds, "", settings, incremental, "xml", files=files):
         yield node
@@ -288,7 +301,7 @@ def get_settings(lang, mode):
         settings = json.loads(request.values.get('settings', '{}'))
     except:
         log.exception("Error in json parsing the settings variable")
-        error = escape(make_trace())
+        error = escape(utils.make_trace())
         settings = {}
     settings_validator = validate_json(schema_json)
     for e in sorted(settings_validator.iter_errors(settings)):
@@ -314,14 +327,3 @@ def check_secret_key(secret_key):
     else:
         log.error("Secret key was not supplied or incorrect.")
         return False
-
-
-def jsonify_error(msg, **kwargs):
-    data = {
-        "error": {
-            "message": msg,
-        }
-    }
-    for key in kwargs:
-        data["error"][key] = kwargs[key]
-    return data

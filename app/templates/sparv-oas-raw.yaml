@@ -315,6 +315,7 @@ paths:
         ```
       parameters:
         - $ref: '#/components/parameters/ModeParam'
+        - $ref: '#/components/parameters/IncrementalParam'
         - $ref: '#/components/parameters/LanguageParam'
         - $ref: '#/components/parameters/SettingsParam'
         - name: email
@@ -673,7 +674,7 @@ components:
             type:
               type: string
               example: files
-        corpus:
+        result:
           type: object
           properties:
             link:
@@ -710,7 +711,7 @@ components:
             hash:
               type: string
               example: ece7233cc6fface3adeef4bfc5dc1e9fdfd94488
-        corpus:
+        result:
           type: object
           properties:
             link:
