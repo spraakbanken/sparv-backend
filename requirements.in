@@ -1,0 +1,9 @@
+# This file is used to create requirements.txt with pip-tools.
+# Run `pip-compile requirements.in`
+
+Flask
+Flask-Cors
+future
+gunicorn
+Markdown
+waitress

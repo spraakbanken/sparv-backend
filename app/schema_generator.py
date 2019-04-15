@@ -11,7 +11,6 @@ log = logging.getLogger('pipeline.' + __name__)
 
 def make_schema(lang, mode):
     """Build settings schema json."""
-
     # Get analysis mode from TOOL_DICT
     analysis = TOOL_DICT.get(lang, "sv")
 
@@ -374,20 +373,21 @@ def positional_attributes(lang, analysis):
         compound_attrs = default_compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
         lexical_classes = ["blingbring", "swefn"]
-        sentiment = ["sentiment", "sentimentclass"]
+        sentiment = default_sentiment = ["sentiment", "sentimentclass"]
     elif analysis in ["sv", "sv-1800"]:
         lexical_attrs = ["pos", "msd", "lemma", "lex", "sense"]
         compound_attrs = ["complemgram", "compwf", "prefix", "suffix"]
         default_compound_attrs = ["complemgram", "compwf"]
         dependency_attributes = ["ref", "dephead", "deprel"]
         lexical_classes = None
+        default_sentiment = None
         sentiment = ["sentiment", "sentimentclass"]
     else:  # analysis in ["fl", "tt"]
         lexical_attrs = ["pos", "msd", "lemma"]
         compound_attrs = default_compound_attrs = None
         dependency_attributes = None
         lexical_classes = None
-        sentiment = None
+        sentiment = default_sentiment = None
 
     return {
         "title": "Positional attributes",
@@ -400,7 +400,7 @@ def positional_attributes(lang, analysis):
             ("compound_attributes", default_compound_attrs),
             ("dependency_attributes", dependency_attributes),
             ("lexical_classes", lexical_classes),
-            ("sentiment", sentiment)
+            ("sentiment", default_sentiment)
         ]),
         "properties": OrderedDict([
             ("lexical_attributes", {
@@ -469,7 +469,7 @@ def positional_attributes(lang, analysis):
                 "description": "Attributes for sentiment analysis",
                 "description_sv": "Attribut för attitydanalysen",
                 "type": "array",
-                "default": sentiment,
+                "default": default_sentiment,
                 "items": {
                     "title": "Attribute",
                     "title_sv": "Attribut",
