@@ -30,7 +30,7 @@ In this case the response is a download link to a zip file containing the annota
 
 
 # Settings
-The web service supports some costum settings, e.g. it lets you chose
+The web service supports some custom settings, e.g. it lets you chose
 between different tokenizers on word, sentence, and paragraph level
 and you can define which annotations should be generated. Via the settings you
 can also chose the language of your input and you can define whether your input
