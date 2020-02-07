@@ -67,6 +67,5 @@ There are several options for running the Sparv backend:
 ## Setup cronjob for cleaning up old builds
 
 ```
-MAILTO=""
 1 0 * * * curl [URL-TO-SPARV-BACKEND]/cleanup?secret_key=
 ```
