@@ -6,4 +6,5 @@ Flask-Cors
 future
 gunicorn
 Markdown
+oyaml
 waitress

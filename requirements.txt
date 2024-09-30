@@ -13,6 +13,7 @@ itsdangerous==1.1.0       # via flask
 jinja2==2.10.1            # via flask
 markdown==3.1
 markupsafe==1.1.1         # via jinja2
+oyaml==1.0
 six==1.12.0               # via flask-cors
-waitress==1.2.1
-werkzeug==0.15.2          # via flask
+waitress==1.4.3
+werkzeug==0.15.5          # via flask
